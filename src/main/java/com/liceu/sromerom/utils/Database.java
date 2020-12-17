@@ -24,9 +24,9 @@ public class Database {
 
             Class.forName("org.sqlite.JDBC");
             //#### Windows ####//
-            String url = "jdbc:sqlite:E:\\Fp informatica\\CFGS 2n any REP\\PracticasEntornServidor\\NotesManagementSpring\\databaseManagement.db";
+            //String url = "jdbc:sqlite:E:\\Fp informatica\\CFGS 2n any REP\\PracticasEntornServidor\\NotesManagementSpring\\databaseManagement.db";
             //#### Linux ####//
-            //String url = "jdbc:sqlite:/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/databaseManagement.db";
+            String url = "jdbc:sqlite:/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/databaseManagement.db";
 
 
             if (connection == null) {

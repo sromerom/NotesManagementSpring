@@ -42,8 +42,7 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //Interceptor Auth/login
-        final String[] loginRequiredURLs = new String[]{"/home", "/unlogin", "/create", "/edit", "/delete", "/deleteAllShare", "/deleteShare", "/share", "/detail", "/users"};
-        registry.addInterceptor(loginInterceptor).addPathPatterns(loginRequiredURLs);
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/*");
 
         //Interceptor CSRF
         registry.addInterceptor(generateCsrfTokenInterceptor).addPathPatterns("/*");

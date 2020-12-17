@@ -1,3 +1,22 @@
-E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\controllers\AppControllerr.java
-E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\config\AppConfig.java
-E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\config\AnnotationWebAppInitializer.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/interceptors/CheckCsrfTokenFilter.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/controllers/ActionsController.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/daos/UserDao.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/services/UserServiceImpl.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/services/UserService.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/services/NoteServiceImpl.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/interceptors/LoginInterceptor.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/config/AnnotationWebAppInitializer.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/utils/RenderableNote.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/controllers/AppController.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/utils/HashUtil.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/utils/Filter.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/daos/NoteDaoImpl.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/config/AppConfig.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/model/Note.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/services/NoteService.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/daos/NoteDao.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/daos/UserDaoImpl.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/interceptors/GenerateCsrfTokenInterceptor.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/utils/ParseUtils.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/model/User.java
+/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/src/main/java/com/liceu/sromerom/utils/Database.java
