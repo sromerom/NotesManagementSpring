@@ -1,0 +1,36 @@
+#container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#container div {
+    text-align: center;
+    flex-basis: 50%;
+    height: 160px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin: 15px;
+}
+
+select {
+    width: 100%;
+}
+
+button {
+    margin: 15px 15px;
+}
+
+p {
+    text-align: center;
+}
