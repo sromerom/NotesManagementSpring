@@ -25,5 +25,5 @@ hs_err_pid*
 
 *.idea
 *.iml
-*.dev.properties
-*.prod.properties
+*.properties
+props/*
