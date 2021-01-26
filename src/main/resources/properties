@@ -1,6 +1,0 @@
-DB_DRIVER = org.sqlite.JDBC
-DB_URL_WINDOWS = jdbc:sqlite:E:\\Fp informatica\\CFGS 2n any REP\\PracticasEntornServidor\\NotesManagementSpring\\databaseManagement.db
-DB_URL_LINUX = jdbc:sqlite:/home/superior/sromerom/Practiques Entorn Servidor/NotesManagementSpring/databaseManagement.db
-DB_USER = root
-DB_ROOT = 1234
-DB_PORT = 3306

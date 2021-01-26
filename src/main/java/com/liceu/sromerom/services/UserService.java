@@ -1,6 +1,7 @@
 package com.liceu.sromerom.services;
 
-import com.liceu.sromerom.model.User;
+
+import com.liceu.sromerom.entities.User;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ public interface UserService {
     List<User> getSharedUsers(long noteid);
 
     User getUserById(long userid);
+
+    User getUserByUsername(String username);
 
     boolean createUser(String email, String username, String password);
 
@@ -27,5 +30,4 @@ public interface UserService {
 
     boolean editDataInfo(long userid, String email, String username);
 
-    long getUserId(String username);
 }

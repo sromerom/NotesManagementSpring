@@ -1,21 +1,20 @@
 package com.liceu.sromerom.services;
 
-import com.liceu.sromerom.model.Note;
+import com.liceu.sromerom.entities.Note;
 import com.liceu.sromerom.utils.RenderableNote;
-//import com.liceu.sromerom.utils.RenderableNote;
 
 import java.util.List;
 
 public interface NoteService {
-    List<RenderableNote> getNotesFromUser(long userid, int offset);
+    List<RenderableNote> getNotesFromUser(long userid, int page);
 
-    List<RenderableNote> getCreatedNotes(long userid, int offset);
+    List<RenderableNote> getCreatedNotes(long userid, int page);
 
-    long getAllNotesLength(long id);
+    long getAllNotesLength(long userid);
 
-    long getCreatedNotesLength(long id);
+    long getCreatedNotesLength(long userid);
 
-    List<RenderableNote> filter(long userid, String type, String search, String initDate, String endDate, int offset);
+    List<RenderableNote> filter(long userid, String type, String search, String initDate, String endDate, int page);
 
     Note getNoteById(long noteid);
 
@@ -25,7 +24,7 @@ public interface NoteService {
 
     boolean addNote(long userid, String title, String body);
 
-    boolean editNote(long userid, long idnote, String title, String body);
+    boolean editNote(long userid, long noteid, String title, String body);
 
     boolean deleteNote(long userid, String[] noteids);
 
@@ -33,18 +32,17 @@ public interface NoteService {
 
     long getSharedNoteId(long noteid);
 
-    List<RenderableNote> getSharedNoteWithMe(long userid, int offset);
+    List<RenderableNote> getSharedNoteWithMe(long userid, int page);
 
-    List<RenderableNote> getSharedNotes(long userid, int offset);
+    List<RenderableNote> getSharedNotes(long userid, int page);
 
     long getLengthSharedNoteWithMe(long userid);
 
     long getLengthSharedNotes(long userid);
 
-    boolean shareNote(long userid, long noteid, String[] usernames);
+    boolean shareNote(long userWhoShares, long noteid, String[] usernames);
 
-    boolean deleteShareNote(long userid, long noteid, String[] usernames);
+    boolean deleteShareNote(long userWhoDeleteShare, long noteid, String[] usernames);
 
     boolean deleteAllShareNote(long userid, long noteid);
-
 }

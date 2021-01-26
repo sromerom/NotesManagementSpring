@@ -32,7 +32,7 @@
                 <!-- Input fields -->
                 <div class="form-group mt-2">
                     <label for="email">Email address</label>
-                    <input type="email" class="form-control" id="email" placeholder="name@example.com" name="newEmail"
+                    <input type="email" class="form-control" id="email" placeholder="name@example.com" name="email"
                            required>
                     <small id="emailHelpBlock" class="form-text text-muted">
                         Your email must be one that is not registered
@@ -40,7 +40,7 @@
                 </div>
                 <div class="form-group mt-2">
                     <label for="username" class="col-sm-2 col-form-label">Username</label>
-                    <input id="username" type="text" class="form-control rounded-right" name="newUser" required>
+                    <input id="username" type="text" class="form-control rounded-right" name="username" required>
                     <small id="userHelpBlock" class="form-text text-muted">
                         Your username must have a minimum of 3 characters long, your username must be one that is not registered and must not contain
                         spaces, special characters, or emoji
@@ -49,7 +49,7 @@
                 <div class="form-group mt-2">
                     <label for="password" class="col-sm-2 col-form-label">Password</label>
                     <input type="password" id="password" class="form-control"
-                           aria-describedby="passwordHelpBlock" name="newPass" required>
+                           aria-describedby="passwordHelpBlock" name="password" required>
                     <small id="passwordHelpBlock" class="form-text text-muted">
                         Your password must have a minimum of 8 characters long, contain letters and numbers, and must not contain
                         spaces, special characters, or emoji.

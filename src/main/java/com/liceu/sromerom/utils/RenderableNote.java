@@ -1,10 +1,12 @@
 package com.liceu.sromerom.utils;
 
-import com.liceu.sromerom.model.User;
+
+
+import com.liceu.sromerom.entities.User;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 
 public class RenderableNote {
     private long noteid;

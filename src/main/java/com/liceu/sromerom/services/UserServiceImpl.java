@@ -1,66 +1,92 @@
 package com.liceu.sromerom.services;
 
-import com.liceu.sromerom.daos.UserDao;
-import com.liceu.sromerom.daos.UserDaoImpl;
-import com.liceu.sromerom.model.User;
+import com.liceu.sromerom.entities.User;
+import com.liceu.sromerom.repos.UserRepo;
 import com.liceu.sromerom.utils.HashUtil;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-@Component
+@Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    UserRepo userRepo;
+
     @Override
     public List<User> getAll(long userid) {
-        UserDao ud = new UserDaoImpl();
-        List<User> users;
-        try {
-            users = ud.getAllUsers(userid);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return users;
+        List<User> usersExceptCurrentUser = userRepo.findAll()
+                .stream()
+                .filter(u -> u.getUserid() != userid)
+                .collect(Collectors.toList());
+        return usersExceptCurrentUser;
     }
 
     @Override
     public List<User> getSharedUsers(long noteid) {
-        UserDao ud = new UserDaoImpl();
-        try {
-            return ud.getUsersFromSharedNote(noteid);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return userRepo.getUsersFromSharedNote(noteid);
     }
 
     @Override
     public User getUserById(long userid) {
-        UserDao ud = new UserDaoImpl();
-        try {
-            return ud.getUserById(userid);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        return userRepo.findById(userid).get();
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepo.findUserByUsername(username);
+    }
+
+    @Transactional
+    @Override
+    public boolean createUser(String email, String username, String password) {
+        User validateUsername = userRepo.findUserByUsername(username);
+        if (validateUsername == null) {
+
+            try {
+                String generatedSecuredPasswordHash = HashUtil.generatePasswordHash(password);
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setUsername(username);
+                newUser.setPassword(generatedSecuredPasswordHash);
+                User insertedUser = userRepo.save(newUser);
+                if (insertedUser != null) return true;
+                return false;
+            } catch (Exception e) {
+                return false;
+            }
         }
+        return false;
+    }
+
+    @Override
+    public boolean existsUserShare(long noteid, String[] sharedUsers) {
+        List<User> usersShared = userRepo.getUsersFromSharedNote(noteid);
+        for (User user : usersShared) {
+            for (String sharedUser : sharedUsers) {
+                if (user.getUsername().equals(sharedUser)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean validateUser(String username, String password) {
-        UserDao ud = new UserDaoImpl();
-
-
         try {
-            //Nomes retornara true quan l'usuari existeixi i la validacio de la contrasenya introduida es la correcta
-            if (ud.existsUserWithUsername(username)) {
-                long userid = ud.getUserIdByUsername(username);
-                String storedPassword = ud.getUserById(userid).getPassword();
+            User userToValidate = userRepo.findUserByUsername(username);
+            if (userToValidate != null) {
+                String storedPassword = userToValidate.getPassword();
                 return HashUtil.validatePassword(password, storedPassword);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e);
             return false;
         }
         return false;
@@ -68,7 +94,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkRegister(String email, String username, String password, String password2) {
-        UserDao ud = new UserDaoImpl();
         Pattern patternPassword = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
         Matcher matcherPassword = patternPassword.matcher(password);
         boolean passwordMatch = matcherPassword.find();
@@ -82,8 +107,10 @@ public class UserServiceImpl implements UserService {
         boolean emailMatch = matcherEmail.find();
 
         try {
+            User validateUsername = userRepo.findUserByUsername(username);
+            User validateEmail = userRepo.findUserByEmail(email);
             //Si compleix tots els requisits que s'ha de seguir per fer un registre, retornarem true
-            if (password.equals(password2) && !ud.existsUserWithUsername(username) && !ud.existsUserWithEmail(email) && passwordMatch && emailMatch && usernameMatch) {
+            if (password.equals(password2) && validateUsername == null && validateEmail == null && passwordMatch && emailMatch && usernameMatch) {
                 return true;
             }
         } catch (Exception e) {
@@ -95,19 +122,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkEditData(long userid, String email, String username) {
-        UserDao ud = new UserDaoImpl();
         try {
-            User user = ud.getUserById(userid);
 
+            User user = userRepo.findById(userid).get();
+            User validateEmail = userRepo.findUserByEmail(email);
+            User validateUsername = userRepo.findUserByUsername(username);
             if (email != null && user != null) {
                 //Si el email introduit no es igual al seu i ja existeix, retornam false ja que no podem tenir email iguals
-                if (!user.getEmail().equals(email) && ud.existsUserWithEmail(email)) return false;
+                if (!user.getEmail().equals(email) && validateEmail != null) return false;
                 Pattern patternEmail = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
                 Matcher matcherEmail = patternEmail.matcher(email);
                 if (!matcherEmail.find()) return false;
 
                 //Si el usernames introduit no es igual al seu i ja existeix, retornam false ja que no podem tenir usernames iguals
-                if (!user.getUsername().equals(username) && ud.existsUserWithUsername(username)) return false;
+                if (!user.getUsername().equals(username) && validateUsername != null) return false;
                 Pattern patternUsername = Pattern.compile("^(?=[a-zA-Z0-9._]{3,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
                 Matcher matcherUsername = patternUsername.matcher(username);
                 if (!matcherUsername.find()) return false;
@@ -123,9 +151,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkPasswordData(long userid, String currentPassword, String password, String password2) {
-        UserDao ud = new UserDaoImpl();
         try {
-            User user = ud.getUserById(userid);
+            User user = userRepo.findById(userid).get();
             boolean validCurrentPassword = validateUser(user.getUsername(), currentPassword);
             if (validCurrentPassword) {
                 Pattern patternPassword = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
@@ -142,78 +169,24 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Transactional
     @Override
     public boolean editPassword(long userid, String password) {
-        UserDao ud = new UserDaoImpl();
-        try {
-            String generatedSecuredPasswordHash = HashUtil.generatePasswordHash(password);
-            ud.updatePasswordById(userid, generatedSecuredPasswordHash);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
-    public boolean editDataInfo(long userid, String email, String username) {
-        UserDao ud = new UserDaoImpl();
-        try {
-            ud.updateDataInfoById(userid, email, username);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
-    public long getUserId(String username) {
-        UserDao ud = new UserDaoImpl();
-        try {
-            return ud.getUserIdByUsername(username);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    @Override
-    public boolean createUser(String email, String username, String password) {
-        try {
-            UserDao ud = new UserDaoImpl();
-
-            if (!ud.existsUserWithUsername(username)) {
-                String generatedSecuredPasswordHash = HashUtil.generatePasswordHash(password);
-                User user = new User(0, email, username, generatedSecuredPasswordHash);
-                ud.create(user);
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        User user = userRepo.findById(userid).get();
+        user.setPassword(password);
+        User updateUser = userRepo.save(user);
+        if (updateUser != null) return true;
         return false;
     }
 
+    @Transactional
     @Override
-    public boolean existsUserShare(long noteid, String[] sharedUsers) {
-        UserDao ud = new UserDaoImpl();
-
-        try {
-            List<User> usersShared = ud.getUsersFromSharedNote(noteid);
-            for (User user : usersShared) {
-                for (String sharedUser : sharedUsers) {
-                    if (user.getUsername().equals(sharedUser)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
+    public boolean editDataInfo(long userid, String email, String username) {
+        User user = userRepo.findById(userid).get();
+        user.setEmail(email);
+        user.setUsername(username);
+        User updateUser = userRepo.save(user);
+        if (updateUser != null) return true;
         return false;
     }
 }
