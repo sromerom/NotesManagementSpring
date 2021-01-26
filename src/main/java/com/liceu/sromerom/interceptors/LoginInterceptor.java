@@ -1,28 +1,33 @@
 package com.liceu.sromerom.interceptors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    HttpSession session;
+
+
     private static final String[] loginRequiredURLs = new String[]{"/home", "/unlogin", "/create", "/edit", "/delete", "/deleteAllShare", "/deleteShare", "/share", "/detail", "/users"};
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession();
+        //HttpSession session = request.getSession();
 
         String urlLogin = request.getContextPath() + "/login";
-        Long userid = null;
+        Long userid = (Long) session.getAttribute("userid");
+        Map<String, String> userDetails = (Map<String, String>) session.getAttribute("userDetails");
 
-        if (session.getAttribute("userid") != null) {
-            userid = (Long) session.getAttribute("userid");
-        }
-
+        
         System.out.println("userid en el interceptor: " + userid);
         //No ha fet login y a damunt vol entrar en la part privada
         if (userid == null && needLogin(request)) {
