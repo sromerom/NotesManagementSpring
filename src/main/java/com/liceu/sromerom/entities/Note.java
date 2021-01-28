@@ -3,7 +3,6 @@ package com.liceu.sromerom.entities;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,16 +25,9 @@ public class Note {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    //@OneToMany(mappedBy = "note", fetch = FetchType.EAGER)
-    //@OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinTable(
-            name = "sharedNotes",
-            joinColumns = @JoinColumn(name = "note_noteid", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="user_userid", nullable = false)
-    )
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<User> sharedUsers;
+    private Set<SharedNote> sharedNotes;
 
     public Long getNoteid() {
         return noteid;
@@ -85,12 +77,12 @@ public class Note {
         this.user = user;
     }
 
-    public Set<User> getSharedUsers() {
-        return sharedUsers;
+    public Set<SharedNote> getSharedNotes() {
+        return sharedNotes;
     }
 
-    public void setSharedUsers(Set<User> sharedUsers) {
-        this.sharedUsers = sharedUsers;
+    public void setSharedNotes(Set<SharedNote> sharedNotes) {
+        this.sharedNotes = sharedNotes;
     }
 
     @Override

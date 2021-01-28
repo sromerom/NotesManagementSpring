@@ -1,7 +1,6 @@
 package com.liceu.sromerom.repos;
 
 
-import com.liceu.sromerom.entities.Note;
 import com.liceu.sromerom.entities.SharedNote;
 import com.liceu.sromerom.entities.SharedNoteCK;
 import org.springframework.data.domain.Pageable;
