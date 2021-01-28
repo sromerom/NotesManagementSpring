@@ -187,8 +187,6 @@ public class NoteController {
 
             //Eliminarem notes sempre i quan tinguem un id d'usuari i tinguem notes per eliminar
             if (userid != null && checkboxDelete.length > 0) {
-                System.out.println("Entramos a borrar crack!!!!");
-                System.out.println("userid: " + userid);
                 System.out.println("Eliminamos las notas: " + Arrays.toString(checkboxDelete));
                 noteService.deleteNote(userid, checkboxDelete);
                 //REDIRECT HACIA EL HOME...

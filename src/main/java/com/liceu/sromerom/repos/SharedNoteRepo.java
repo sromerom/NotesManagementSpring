@@ -35,9 +35,11 @@ public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> 
     //LengthSharedNoteWithMe
     long countByUser_Userid(long userid);
 
-    //Exists sharedNote?
+    //Exists sharedNoteAndSpecificUser?
     SharedNote findByUser_UseridAndNote_Noteid(long userid, long noteid);
 
+    //Exists note with noteid
+    boolean existsByNote_Noteid(long noteid);
 
     List<SharedNote> findByNote_Noteid(long noteid);
 

@@ -223,16 +223,24 @@ public class NoteServiceImpl implements NoteService {
     public boolean deleteNote(long userid, String[] noteids) {
         List<Note> notesToDelete = new ArrayList<>();
         for (String noteid : noteids) {
-            System.out.println("Es owner de esta maravillosa nota? " + isNoteOwner(userid, Long.parseLong(noteid)));
             if (!isNoteOwner(userid, Long.parseLong(noteid))) return false;
             Note noteToDelete = noteRepo.findById(Long.parseLong(noteid)).get();
             notesToDelete.add(noteToDelete);
         }
 
         for (Note n : notesToDelete) {
-            System.out.println("Entro para eliminaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar");
-            System.out.println("Se elimina la nota: ------------------------------------------------------------");
-            System.out.println(n);
+            /*
+            if (sharedNoteRepo.existsByNote_Noteid(n.getNoteid())) {
+                List<String> listUsernames = new ArrayList<>();
+                userRepo.getUsersFromSharedNote(n.getNoteid())
+                        .stream()
+                        .map(ne-> listUsernames.add(ne.getUsername()))
+                        .collect(Collectors.toList());
+                String[] usernamesToDeleteShare = new String[listUsernames.size()];
+                listUsernames.toArray(usernamesToDeleteShare);
+                deleteShareNote(userid, n.getNoteid(), usernamesToDeleteShare);
+            }
+             */
             noteRepo.delete(n);
         }
         return false;

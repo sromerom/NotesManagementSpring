@@ -32,6 +32,9 @@ public class GoogleServiceImpl implements GoogleService{
     String redirectUri;
 
     public URL getGoogleRedirectURL() throws Exception {
+        System.out.println(clientId);
+        System.out.println(clientSecret);
+        System.out.println(redirectUri);
         URIBuilder b = new URIBuilder("https://accounts.google.com/o/oauth2/v2/auth");
         b.addParameter("scope", "https://www.googleapis.com/auth/userinfo.email");
         b.addParameter("access_type", "offline");

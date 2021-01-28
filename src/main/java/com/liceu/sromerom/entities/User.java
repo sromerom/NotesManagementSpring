@@ -27,9 +27,11 @@ public class User {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    //@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "sharedUsers")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<SharedNote> sharedNotes;
+    private Set<Note> sharedNotes;
 
     public Long getUserid() {
         return userid;
@@ -71,11 +73,11 @@ public class User {
         this.notes = notes;
     }
 
-    public Set<SharedNote> getSharedNotes() {
+    public Set<Note> getSharedNotes() {
         return sharedNotes;
     }
 
-    public void setSharedNotes(Set<SharedNote> sharedNotes) {
+    public void setSharedNotes(Set<Note> sharedNotes) {
         this.sharedNotes = sharedNotes;
     }
 
