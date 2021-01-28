@@ -11,10 +11,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
+
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private String username;
     private String password;
 
+    private boolean isGoogleUser;
     //@OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -82,5 +87,13 @@ public class User {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    public boolean isGoogleUser() {
+        return isGoogleUser;
+    }
+
+    public void setGoogleUser(boolean googleUser) {
+        isGoogleUser = googleUser;
     }
 }

@@ -2,9 +2,7 @@ package com.liceu.sromerom.controllers;
 
 
 import com.liceu.sromerom.services.NoteService;
-import com.liceu.sromerom.services.NoteServiceImpl;
 import com.liceu.sromerom.services.UserService;
-import com.liceu.sromerom.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,10 +33,11 @@ public class ShareController {
 
             if (!noteService.isNoteOwner(userid, noteid)) {
                 //REDIRECT A RESTRICTED AREA
-
+                return "redirect:/restrictedArea";
             }
         } else {
             //REDIRECT AL HOME
+            return "redirect:/home";
         }
 
         model.addAttribute("action", "/share");
@@ -50,13 +49,14 @@ public class ShareController {
         Long userid = (Long) request.getSession().getAttribute("userid");
         boolean noError = false;
 
-        if (toShare != null && noteid != null && toShare.length > 0 && !userService.existsUserShare(noteid, toShare)) {
+        if (toShare != null && noteid != null && toShare.length > 0 && !userService.existsUserShare(noteid, userid, toShare)) {
             //noError = ns.shareNote(userid, noteid, sharedUsers);
             noError = noteService.shareNote(userid, noteid, toShare);
         }
 
         if (noError) {
             //REDIRECT AL HOME PORQUE HA IDO BIEN
+            return "redirect:/home";
         }
 
         model.addAttribute("noError", false);
@@ -73,11 +73,14 @@ public class ShareController {
             model.addAttribute("users", userService.getAll(userid));
             model.addAttribute("usersShared", userService.getSharedUsers(noteid));
 
+
             if (!noteService.isNoteOwner(userid, noteid)) {
                 //REDIRECT A RESTRICTED AREA
+                return "redirect:/restrictedArea";
             }
         } else {
             //REDIRECT AL HOME
+            return "redirect:/home";
         }
 
         model.addAttribute("action", "/deleteShare");
@@ -92,7 +95,7 @@ public class ShareController {
             System.out.println("Es note owner y el ha compartido su nota!!!!!!!!!!!");
             //Eliminarem sempre i quan existeixi usuaris a eliminar el share i que existeixi un share amb aquells usuaris
             //Mirar metodo existsUserShare
-            if (toDeleteShare != null && userService.existsUserShare(noteid, toDeleteShare)) {
+            if (toDeleteShare != null && userService.existsUserShare(noteid,userid, toDeleteShare)) {
                 System.out.println("Existe share con estos usuarios!!!!!!!!!!!!!!");
                 noError = noteService.deleteShareNote(userid, noteid, toDeleteShare);
             }

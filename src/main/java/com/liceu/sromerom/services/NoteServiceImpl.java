@@ -7,6 +7,7 @@ import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.repos.NoteRepo;
 import com.liceu.sromerom.repos.SharedNoteRepo;
 import com.liceu.sromerom.repos.UserRepo;
+import com.liceu.sromerom.utils.Filter;
 import com.liceu.sromerom.utils.RenderableNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
         List<Note> allNotes = noteRepo.getAllNotesFromUser(userid, topTen);
 
         try {
-            renderableNotes = parseNoteToRenderable(allNotes,sharedNotes);
+            renderableNotes = parseNoteToRenderable(allNotes, sharedNotes);
             return renderableNotes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,9 +59,7 @@ public class NoteServiceImpl implements NoteService {
         List<Note> createdNotes = noteRepo.findByUser_Userid(userid, topTen);
 
         if (createdNotes != null) {
-            for (Note n : createdNotes) {
-                renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification()));
-            }
+            createdNotes.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification())));
             return renderableNotes;
         }
 
@@ -79,7 +78,82 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<RenderableNote> filter(long userid, String type, String search, String initDate, String endDate, int page) {
-        return null;
+        System.out.println(type);
+        System.out.println("search: " + search);
+        System.out.println("initDate " + initDate);
+        System.out.println("endDate: " + endDate);
+        List<Note> notes;
+        try {
+            Pageable topTen = PageRequest.of(page, LIMIT);
+            if (!Filter.checkTypeFilter(search, initDate, endDate).equals("filterByDate")) {
+                System.out.println("Busqueda sin fechas!!!!!!!!!");
+                initDate = "1970-01-01 00:00:00";
+                endDate = "2021-01-30 00:00:00";
+            }
+
+            if (type == null) type = "";
+
+            switch (type) {
+                case "sharedNotesWithMe":
+                    System.out.println("Filtramos en notas compartidas contigo!!");
+                    notes = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, topTen)
+                            .stream().map(a -> a.getNote())
+                            .collect(Collectors.toList());
+                    break;
+                case "sharedNotesByYou":
+                    System.out.println("Filtramos en notas compartidas por ti!!");
+                    notes = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, topTen)
+                            .stream().map(a -> a.getNote())
+                            .collect(Collectors.toList());
+                    break;
+                case "ownerNotes":
+                    System.out.println("Filtramos en notas creadas!!");
+                    notes = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, topTen);
+                    break;
+                default:
+                    System.out.println("Filtramos en todas las notas!!");
+                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
+                    break;
+            }
+
+
+            //List<Note> createsNoteFilter = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, topTen);
+            //List<Note> sharedNoteFilter = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, topTen);
+            //List<Note> sharedNoteWithMeFilter = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, topTen);
+            //List<Note> notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
+            System.out.println("Notas normales----------------------------------------------------------------------------------------------");
+            //System.out.println(notes.toString());
+            System.out.println("-----------------------------------------------------");
+            System.out.println("Notas creades----------------------------------------------------------------------------------------------");
+            //System.out.println(createsNoteFilter.toString());
+            //System.out.println(sharedNoteFilter.toString());
+            //System.out.println(sharedNoteWithMeFilter.toString());
+            System.out.println();
+            System.out.println("-----------------------------------------------------");
+            /*
+            switch (Filter.checkTypeFilter(search, initDate, endDate)) {
+                case "filterByTitle":
+                    notes = noteRepo.filterNotesBySearch(userid, search, topTen);
+                    break;
+                case "filterByDate":
+                    System.out.println("initDate: " + initDate);
+                    System.out.println("endDate: " + endDate);
+                    notes = noteRepo.filterNotesByDate(userid, initDate, endDate, topTen);
+                    break;
+                case "filterAll":
+                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
+                    break;
+            }
+             */
+            List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
+                    .stream().map(a -> a.getNote())
+                    .collect(Collectors.toList());
+            List<RenderableNote> renderableNotes = parseNoteToRenderable(notes, sharedNotes);
+            return renderableNotes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -90,8 +164,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public boolean isNoteOwner(long userid, long noteid) {
 
-        User user = userRepo.findById(userid).get();
-        Note noteOwner = noteRepo.findNoteByNoteidAndUser(noteid, user);
+        Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
         if (noteOwner != null) return true;
         return false;
     }
@@ -176,30 +249,22 @@ public class NoteServiceImpl implements NoteService {
     public List<RenderableNote> getSharedNoteWithMe(long userid, int page) {
         Pageable topTen = PageRequest.of(page, 10);
         List<RenderableNote> renderableNotes = new ArrayList<>();
-        List<SharedNote> sh = sharedNoteRepo.findByUser_Userid(userid, topTen);
-        List<Note> sharedNotesWithMe = new ArrayList<>();
-        for (int i = 0; i < sh.size(); i++) {
-            sharedNotesWithMe.add(sh.get(i).getNote());
-        }
+        List<Note> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, topTen)
+                .stream().map(a -> a.getNote())
+                .collect(Collectors.toList());
 
-        for (Note n : sharedNotesWithMe) {
-            renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification()));
-        }
-
+        sharedNotesWithMe.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification())));
         return renderableNotes;
     }
 
     @Override
     public List<RenderableNote> getSharedNotes(long userid, int page) {
         List<RenderableNote> renderableNotes = new ArrayList<>();
-        //List<SharedNote> sh = sharedNoteRepo.findByNote_User_Userid(userid);
         Pageable topTen = PageRequest.of(page, LIMIT);
-        List<SharedNote> sh = sharedNoteRepo.findByNote_User_Userid(userid, topTen);
-        List<Note> sharedNotes = new ArrayList<>();
+        List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
+                .stream().map(a -> a.getNote())
+                .collect(Collectors.toList());
 
-        for (int i = 0; i < sh.size(); i++) {
-            sharedNotes.add(sh.get(i).getNote());
-        }
 
         for (Note n : sharedNotes) {
             List<User> sharedUsersFromNote = noteRepo.getUsersFromSharedNote(n.getNoteid());
@@ -355,40 +420,6 @@ public class NoteServiceImpl implements NoteService {
             }
             result.add(new RenderableNote(note.getNoteid(), note.getUser(), sharedUsersFromNote, note.getTitle(), note.getBody(), note.getCreationDate(), note.getLastModification()));
         }
-        /*
-        List<Note> allNotes = new ArrayList<>();
-        List<Note> parsedSharedNotes = new ArrayList<>();
-        List<Note> parsedSharedNotesWithMe = new ArrayList<>();
-        List<RenderableNote> allRenderablesNotes = new ArrayList<>();
-
-        for (SharedNote sn : sharedNotes) {
-            parsedSharedNotes.add(sn.getNote());
-        }
-
-        for (SharedNote sn : sharedNotesWithMe) {
-            parsedSharedNotesWithMe.add(sn.getNote());
-        }
-
-        allNotes.addAll(createsNotes);
-        allNotes.addAll(parsedSharedNotesWithMe);
-
-        Collections.sort(allNotes, (d1, d2) -> (int) (d2.getNoteid() - d1.getNoteid()));
-
-        for (Note allNote : allNotes) {
-            List<User> sharedUsersFromNote = null;
-            for (int j = 0; j < sharedNotes.size(); j++) {
-                if (sharedNotes.get(j).getNote().getNoteid() == allNote.getNoteid()) {
-                    //sharedUsersFromNote = ud.getUsersFromSharedNote(sharedNotes.get(j).getNoteid());
-                    sharedUsersFromNote = noteRepo.getUsersFromSharedNote(sharedNotes.get(j).getNote().getNoteid());
-                    sharedNotes.remove(j);
-                    break;
-                }
-            }
-            allRenderablesNotes.add(new RenderableNote(allNote.getNoteid(), allNote.getUser(), sharedUsersFromNote, allNote.getTitle(), allNote.getBody(), allNote.getCreationDate(), allNote.getLastModification()));
-        }
-        return allRenderablesNotes;
-
-         */
         return result;
     }
 }

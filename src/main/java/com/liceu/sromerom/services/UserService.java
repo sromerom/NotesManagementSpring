@@ -13,10 +13,13 @@ public interface UserService {
     User getUserById(long userid);
 
     User getUserByUsername(String username);
+    User getUserByEmail(String email);
 
-    boolean createUser(String email, String username, String password);
+    String createNewUsernameFromEmail(String email);
 
-    boolean existsUserShare(long noteid, String[] sharedUsers);
+    boolean createUser(String email, String username, String password, boolean googleUser);
+
+    boolean existsUserShare(long noteid, long userid, String[] sharedUsers);
 
     boolean validateUser(String username, String password);
 

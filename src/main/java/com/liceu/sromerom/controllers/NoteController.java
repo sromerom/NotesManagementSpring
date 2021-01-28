@@ -2,6 +2,7 @@ package com.liceu.sromerom.controllers;
 
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
+import com.liceu.sromerom.utils.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -64,6 +65,11 @@ public class NoteController {
             totalPages = (int) Math.ceil(noteService.getAllNotesLength(userid) / (PAGES_FOR_NOTE));
         }
 
+        //Aplicam els filtres de cerca ja sigui per date o per search de paraules clau
+        if (Filter.checkFilter(titleFilter, noteStart, noteEnd)) {
+            model.addAttribute("notes", noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
+            totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)).size() / (PAGES_FOR_NOTE));
+        }
         //Pasam a la vista tots els parametres corresponents amb la paginacio
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", currentPage);

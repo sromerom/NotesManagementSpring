@@ -47,10 +47,9 @@ public class Filter {
 
     public static boolean checkFilter(String search, String initDate, String endDate) {
         if (search != null && initDate != null && endDate != null) {
-            if (!search.equals("") && !initDate.equals("") && !endDate.equals("")) return true;
+            if (!search.equals("") && !initDate.equals("") && !endDate.equals("")) return false;
             if (!search.equals("") && initDate.equals("") && endDate.equals("")) return true;
-            return search.equals("") && !initDate.equals("") && !endDate.equals("");
-
+            if (search.equals("") && !initDate.equals("") && !endDate.equals("")) return true;
         }
         return false;
     }

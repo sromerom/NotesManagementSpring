@@ -7,7 +7,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 
 @Component
@@ -21,11 +20,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //HttpSession session = request.getSession();
-
         String urlLogin = request.getContextPath() + "/login";
         Long userid = (Long) session.getAttribute("userid");
-        Map<String, String> userDetails = (Map<String, String>) session.getAttribute("userDetails");
 
         
         System.out.println("userid en el interceptor: " + userid);
@@ -45,7 +41,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         //Si s'arriba fins aqui, voldra dir dues coses:
         // 1.- Que l'usuari ha fet login y es troba en una pagina que no es el login.
         // 2.- L'usuari es la primera vegada que entra y no te cap sessio iniciada, per tant en la part del login ho deixarem passar
-
         return true;
     }
 

@@ -360,7 +360,7 @@
                     <form id="formModal" class="card-link" method="POST" action="/deleteShare">
                         <input type="hidden" name="_csrftoken" value="${csrfToken}">
                         <input id="noteIdHidden" type="hidden" name="noteid" value="">
-                        <input id="userHidden" type="hidden" name="users[]" value="sromerom">
+                        <input id="userHidden" type="hidden" name="users[]" value="${username}">
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>

@@ -1,12 +1,16 @@
 package com.liceu.sromerom.services;
 
+import com.liceu.sromerom.entities.Note;
 import com.liceu.sromerom.entities.User;
+import com.liceu.sromerom.repos.NoteRepo;
 import com.liceu.sromerom.repos.UserRepo;
 import com.liceu.sromerom.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +21,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    NoteRepo noteRepo;
 
     @Override
     public List<User> getAll(long userid) {
@@ -42,19 +49,46 @@ public class UserServiceImpl implements UserService {
         return userRepo.findUserByUsername(username);
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepo.findUserByEmail(email);
+    }
+
+    @Override
+    public String createNewUsernameFromEmail(String email) {
+        //sromerom@esliceu.net
+        int min = 999;
+        int max = 10000;
+        String newUsername = email.split("@")[0];
+        User validateUsername = userRepo.findUserByUsername(newUsername);
+        while (validateUsername != null) {
+            int randomNumber = (int)(Math.random() * (max - min + 1) + min);
+            newUsername += randomNumber;
+            validateUsername = userRepo.findUserByUsername(newUsername);
+        }
+        return newUsername;
+    }
+
     @Transactional
     @Override
-    public boolean createUser(String email, String username, String password) {
+    public boolean createUser(String email, String username, String password, boolean googleUser) {
         User validateUsername = userRepo.findUserByUsername(username);
         if (validateUsername == null) {
-
+            System.out.println("Entras aqui???????????????????");
             try {
-                String generatedSecuredPasswordHash = HashUtil.generatePasswordHash(password);
                 User newUser = new User();
+                String generatedSecuredPassword;
+                if (googleUser) {
+                    generatedSecuredPassword = null;
+                } else {
+                    generatedSecuredPassword = HashUtil.generatePasswordHash(password);
+                }
                 newUser.setEmail(email);
                 newUser.setUsername(username);
-                newUser.setPassword(generatedSecuredPasswordHash);
+                newUser.setPassword(generatedSecuredPassword);
+                newUser.setGoogleUser(googleUser);
                 User insertedUser = userRepo.save(newUser);
+                System.out.println("Ha salido bien??????????????????????: " + insertedUser);
                 if (insertedUser != null) return true;
                 return false;
             } catch (Exception e) {
@@ -65,15 +99,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsUserShare(long noteid, String[] sharedUsers) {
-        List<User> usersShared = userRepo.getUsersFromSharedNote(noteid);
-        for (User user : usersShared) {
+    public boolean existsUserShare(long noteid, long userid, String[] sharedUsers) {
+        User user = userRepo.findById(userid).get();
+        Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
+        List<User> usersShared = new ArrayList<>();
+
+        //Si no es owner, voldra dir que l'usuari amb qui s'ha compartit la nota, no vol seguir amb aquell share.
+        if (noteOwner == null) {
+            usersShared.add(user);
+        } else { //L'usuari qui l'ha compartit, vol descompartir-la ara.
+            usersShared = userRepo.getUsersFromSharedNote(noteid);
+        }
+
+        int aux = 0;
+        for (User u : usersShared) {
             for (String sharedUser : sharedUsers) {
-                if (user.getUsername().equals(sharedUser)) {
-                    return true;
+                System.out.println(u.getUsername() + "=?" + sharedUser);
+                if (u.getUsername().equals(sharedUser)) {
+                    aux++;
+                    break;
                 }
             }
         }
+
+        if (aux == sharedUsers.length) return true;
         return false;
     }
 

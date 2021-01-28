@@ -1,5 +1,6 @@
 package com.liceu.sromerom.controllers;
 
+import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.services.GoogleService;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
@@ -34,14 +35,20 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public String postLogin(@RequestParam("username") String user, @RequestParam("password") String pass, HttpServletRequest req) {
+    public String postLogin(@RequestParam("username") String username, @RequestParam("password") String pass, HttpServletRequest req, Model model) {
         //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
-        if (user != null && pass != null && userService.validateUser(user, pass)) {
-            HttpSession session = req.getSession();
-            session.setAttribute("userid", userService.getUserByUsername(user).getUserid());
-            return "redirect:/home";
+        User user = userService.getUserByUsername(username);
+
+        //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
+        if (user != null && pass != null) {
+            if (!user.isGoogleUser() && userService.validateUser(username, pass)) {
+                HttpSession session = req.getSession();
+                session.setAttribute("userid", userService.getUserByUsername(username).getUserid());
+                return "redirect:/home";
+            }
         }
 
+        model.addAttribute("noerror", false);
         return "login";
     }
 
@@ -71,7 +78,7 @@ public class UserController {
             boolean canRegister = userService.checkRegister(email, username, password, repeatPassword);
             //Si les dades poden ser registrades, procedirem a crear un usuari
             if (canRegister) {
-                noError = userService.createUser(email, username, password);
+                noError = userService.createUser(email, username, password, false);
             } else {
                 noError = false;
             }
@@ -88,33 +95,44 @@ public class UserController {
         return "userProfile";
     }
 
-    @GetMapping("/app")
-    public String app() throws Exception{
-        System.out.println("Entramos a la app!!!!!!!!!!!!!!");
+    @GetMapping("/loginGoogle")
+    public String loginGoogle() throws Exception {
         URL url = googleService.getGoogleRedirectURL();
-        System.out.println(url);
         return "redirect:" + url;
     }
 
 
     @GetMapping("/auth/oauth2callback/")
-    @ResponseBody
     public String oauthCallback(@RequestParam String code, HttpSession session) throws Exception {
-        System.out.println("Codigo: " + code);
         String accessToken = googleService.getAccessToken(code);
         Map<String, String> userDetails = googleService.getUserDetails(accessToken);
-        session.setAttribute("userDetails", userDetails);
-        return "redirect:/success";
-    }
+        String emailGoogleAccount = userDetails.get("email");
+        User user = userService.getUserByEmail(emailGoogleAccount);
+        boolean noError = false;
 
-    @GetMapping("/success")
-    @ResponseBody
-    public String success(HttpSession httpSession) {
-        Map<String, String> userDetails = (Map<String, String>) httpSession.getAttribute("userDetails");
-        if (userDetails == null) {
-            return "No autoritzat";
+        if (user != null && user.isGoogleUser()) {
+            System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
+            //Ya esta registrado, lo llevamos al home
+            noError = true;
+        }
+        //Quitar en un futuro
+        if (user != null && !user.isGoogleUser()) {
+            System.out.println("Ya hay una cuenta registrada con dicho email...");
+            //Ir a pantalla dedicada
         }
 
-        return userDetails.toString();
+        if (user == null) {
+            String usernameGenerated = userService.createNewUsernameFromEmail(userDetails.get("email"));
+            System.out.println("Es un usuario nuevo y por eso le creamos este usuario provisional: " + usernameGenerated);
+            noError = userService.createUser(emailGoogleAccount, usernameGenerated, null, true);
+        }
+
+        if (noError) {
+            user = userService.getUserByEmail(emailGoogleAccount);
+            session.setAttribute("userid", user.getUserid());
+            return "redirect:/home";
+        } else {
+            return "redirect:/login";
+        }
     }
 }
