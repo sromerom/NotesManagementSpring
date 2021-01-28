@@ -27,73 +27,11 @@ public class User {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<SharedNote> sharedNotes;
+    @ManyToMany
+    @JoinTable(
+            name = "sharedNotes",
+            joinColumns = @JoinColumn(name = "user_userid"),
+            inverseJoinColumns = @JoinColumn(name = "note_noteid"))
+    Set<Note> sharedNotes;
 
-    public Long getUserid() {
-        return userid;
-    }
-
-    public void setUserid(Long userid) {
-        this.userid = userid;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<Note> getNotes() {
-        return notes;
-    }
-
-    public void setNotes(Set<Note> notes) {
-        this.notes = notes;
-    }
-
-    public Set<SharedNote> getSharedNotes() {
-        return sharedNotes;
-    }
-
-    public void setSharedNotes(Set<SharedNote> sharedNotes) {
-        this.sharedNotes = sharedNotes;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "userid=" + userid +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
-
-    public boolean isGoogleUser() {
-        return isGoogleUser;
-    }
-
-    public void setGoogleUser(boolean googleUser) {
-        isGoogleUser = googleUser;
-    }
 }
