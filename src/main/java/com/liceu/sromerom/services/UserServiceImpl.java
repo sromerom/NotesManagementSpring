@@ -40,6 +40,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getUnsharedUsers(long userid, long noteid) {
+        Note note = noteRepo.findById(noteid).get();
+        List<User> sharedUsers = userRepo.getUsersFromSharedNote(noteid);
+        List<User> usersExceptCurrentUser = userRepo.findAll()
+                .stream()
+                .filter(u -> u.getUserid() != userid)
+                .collect(Collectors.toList());
+
+        if (sharedUsers.size() <= 0 ) return usersExceptCurrentUser;
+        List<User> unsharedUsers = new ArrayList<>();
+
+        for (User all : usersExceptCurrentUser) {
+            boolean add = false;
+            for (User sharedUser: sharedUsers) {
+                if (all.getUserid() != sharedUser.getUserid() && all.getUserid() != note.getUser().getUserid()) {
+                    add = true;
+                } else {
+                    add = false;
+                    break;
+                }
+            }
+            if (add){
+                unsharedUsers.add(all);
+            }
+        }
+
+
+        return unsharedUsers;
+    }
+
+    @Override
     public User getUserById(long userid) {
         return userRepo.findById(userid).get();
     }
@@ -100,17 +131,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsUserShare(long noteid, long userid, String[] sharedUsers) {
+        System.out.println("UserWhoDeleteShare: " + userid);
+        System.out.println("noteid: " + noteid);
+        System.out.println("Users to delete: " + Arrays.toString(sharedUsers));
+
         User user = userRepo.findById(userid).get();
         Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
-        List<User> usersShared = new ArrayList<>();
+        List<User> usersShared = userRepo.getUsersFromSharedNote(noteid);
 
         //Si no es owner, voldra dir que l'usuari amb qui s'ha compartit la nota, no vol seguir amb aquell share.
+        /*
         if (noteOwner == null) {
             usersShared.add(user);
         } else { //L'usuari qui l'ha compartit, vol descompartir-la ara.
             usersShared = userRepo.getUsersFromSharedNote(noteid);
         }
-
+         */
         int aux = 0;
         for (User u : usersShared) {
             for (String sharedUser : sharedUsers) {

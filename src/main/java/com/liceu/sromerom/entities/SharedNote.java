@@ -1,9 +1,6 @@
 package com.liceu.sromerom.entities;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
+import javax.persistence.*;
 
 
 //@Table(uniqueConstraints={
@@ -19,12 +16,15 @@ public class SharedNote {
 
     @ManyToOne
     @MapsId("userid")
+    @JoinColumn(name = "user_userid")
     private User user;
 
     @ManyToOne
     @MapsId("noteid")
+    @JoinColumn(name = "note_noteid")
     private Note note;
 
+    private String permissionMode;
 
     public SharedNoteCK getId() {
         return id;
@@ -50,12 +50,22 @@ public class SharedNote {
         this.note = note;
     }
 
+    public String getPermissionMode() {
+        return permissionMode;
+    }
+
+    public void setPermissionMode(String permissionMode) {
+        this.permissionMode = permissionMode;
+    }
+
+
     @Override
     public String toString() {
         return "SharedNote{" +
                 "id=" + id +
                 ", user=" + user +
                 ", note=" + note +
+                ", permissionMode='" + permissionMode + '\'' +
                 '}';
     }
 }

@@ -50,8 +50,8 @@ public class SharedNoteCK implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SharedNoteCK)) return false;
         SharedNoteCK that = (SharedNoteCK) o;
-        return userid.equals(that.userid) &&
-                noteid.equals(that.noteid);
+        return Objects.equals(userid, that.userid) &&
+                Objects.equals(noteid, that.noteid);
     }
 
     @Override

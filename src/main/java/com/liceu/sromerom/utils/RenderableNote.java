@@ -16,9 +16,10 @@ public class RenderableNote {
     private String body;
     private LocalDateTime creationDate;
     private LocalDateTime lastModification;
+    private boolean writeable;
 
 
-    public RenderableNote(long noteid, User owner, List<User> sharedUsers, String title, String body, LocalDateTime creationDate, LocalDateTime lastModification) {
+    public RenderableNote(long noteid, User owner, List<User> sharedUsers, String title, String body, LocalDateTime creationDate, LocalDateTime lastModification, boolean writeable) {
         this.noteid = noteid;
         this.owner = owner;
         this.sharedUsers = sharedUsers;
@@ -26,21 +27,9 @@ public class RenderableNote {
         this.body = body;
         this.creationDate = creationDate;
         this.lastModification = lastModification;
+        this.writeable = writeable;
     }
 
-
-    @Override
-    public String toString() {
-        return "RenderableNote{" +
-                "noteid=" + noteid +
-                ", owner=" + owner +
-                ", sharedUsers=" + sharedUsers +
-                ", title='" + title + '\'' +
-                ", body='" + body + '\'' +
-                ", creationDate=" + creationDate +
-                ", lastModification=" + lastModification +
-                '}';
-    }
 
     public long getNoteid() {
         return noteid;
@@ -96,5 +85,27 @@ public class RenderableNote {
 
     public void setLastModification(LocalDateTime lastModification) {
         this.lastModification = lastModification;
+    }
+
+    public boolean getWriteable() {
+        return writeable;
+    }
+
+    public void setWriteable(boolean writeable) {
+        this.writeable = writeable;
+    }
+
+    @Override
+    public String toString() {
+        return "RenderableNote{" +
+                "noteid=" + noteid +
+                ", owner=" + owner +
+                ", sharedUsers=" + sharedUsers +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", creationDate=" + creationDate +
+                ", lastModification=" + lastModification +
+                ", writeable=" + writeable +
+                '}';
     }
 }

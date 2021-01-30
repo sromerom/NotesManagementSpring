@@ -264,7 +264,6 @@
                                         <h6 class="card-subtitle mb-2 text-muted dateInfo"
                                             style="font-size: 10px; margin-top: 10px;">Last
                                             Modification ${util.parseDefaultDateTime(note.lastModification)}</h6>
-
                                     </div>
                                 </div>
                             </c:otherwise>
@@ -279,19 +278,52 @@
                                 <h6 class="card-subtitle mb-2 text-muted">Created By ${note.owner.username}</h6>
                                 <p class="card-text"
                                    style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;overflow: hidden;">${util.cleanBody(note.body)}</p>
-
-                                <div class="optionsButtons">
-                                    <a data-toggle="modal" data-target="#modalDeleteShares"
-                                       onclick="passNoteId(${note.noteid})">
-                                        <svg width="1em" height="1em" viewBox="0 0 16 16"
-                                             class="bi bi-person-x-fill"
-                                             fill="currentColor"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd"
-                                                  d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6.146-2.854a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"></path>
-                                        </svg>
-                                    </a>
-
+                                <div class="optionsButtons"
+                                     <c:if test="${note.writeable eq true}">style="background-color: #f9c22e; border: 2px solid black; padding: 8px;" </c:if>>
+                                    <c:choose>
+                                        <c:when test="${note.writeable eq true}">
+                                            <a href="${pageContext.request.contextPath}/edit?id=${note.noteid}">
+                                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                                     class="bi bi-pencil-fill"
+                                                     fill="currentColor"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
+                                                </svg>
+                                            </a>
+                                            <a class="card-link"
+                                               href="${pageContext.request.contextPath}/share?id=${note.noteid}">
+                                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                                     class="bi bi-share-fill"
+                                                     fill="currentColor"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"></path>
+                                                </svg>
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/deleteShare?id=${note.noteid}">
+                                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                                     class="bi bi-person-x-fill"
+                                                     fill="currentColor"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6.146-2.854a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"></path>
+                                                </svg>
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a data-toggle="modal" data-target="#modalDeleteShares"
+                                               onclick="passNoteId(${note.noteid})">
+                                                <svg width="1em" height="1em" viewBox="0 0 16 16"
+                                                     class="bi bi-person-x-fill"
+                                                     fill="currentColor"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6.146-2.854a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"></path>
+                                                </svg>
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/detail?id=${note.noteid}">
                                     <span class="link-spanner"></span>
@@ -371,13 +403,13 @@
 <%@ include file="parts/footer.jsp" %>
 
 <script>
-    $(function() {
+    $(function () {
         $('input[name="noteStart"]').daterangepicker({
             singleDatePicker: true,
             timePicker: true,
             autoUpdateInput: false,
             minYear: 1901,
-            maxYear: parseInt(moment().format('YYYY'),10),
+            maxYear: parseInt(moment().format('YYYY'), 10),
             locale: {
                 format: 'YYYY-MM-DD hh:mm:ss'
             }
@@ -387,24 +419,24 @@
             timePicker: true,
             autoUpdateInput: false,
             minYear: 1901,
-            maxYear: parseInt(moment().format('YYYY'),10),
+            maxYear: parseInt(moment().format('YYYY'), 10),
             locale: {
                 format: 'YYYY-MM-DD HH:mm:ss'
             }
         });
-        $('input[name="noteStart"]').on('apply.daterangepicker', function(ev, picker) {
+        $('input[name="noteStart"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm:ss'));
         });
 
-        $('input[name="noteStart"]').on('cancel.daterangepicker', function(ev, picker) {
+        $('input[name="noteStart"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
-        $('input[name="noteEnd"]').on('apply.daterangepicker', function(ev, picker) {
+        $('input[name="noteEnd"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm:ss'));
         });
 
-        $('input[name="noteEnd"]').on('cancel.daterangepicker', function(ev, picker) {
+        $('input[name="noteEnd"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
     });

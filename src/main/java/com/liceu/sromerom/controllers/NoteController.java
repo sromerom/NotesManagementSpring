@@ -22,7 +22,6 @@ public class NoteController {
     @Autowired
     NoteService noteService;
 
-
     @GetMapping("/home")
     public String home(@RequestParam(required = false) Integer currentPage,
                        @RequestParam(required = false) String typeNote,
@@ -61,6 +60,9 @@ public class NoteController {
             }
         } else {
             model.addAttribute("typeNote", "allNotes");
+            System.out.println("-----------------------------------------------------------------------");
+            System.out.println(noteService.getNotesFromUser(userid, currentPage - 1));
+            System.out.println("------------------------------------------------------------------------");
             model.addAttribute("notes", noteService.getNotesFromUser(userid, currentPage - 1));
             totalPages = (int) Math.ceil(noteService.getAllNotesLength(userid) / (PAGES_FOR_NOTE));
         }
@@ -139,7 +141,7 @@ public class NoteController {
 
             model.addAttribute("action", "/edit");
 
-            if (noteService.isNoteOwner(userid, noteid)) {
+            if (noteService.isNoteOwner(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
                 System.out.println("Si es note owner!! puede editar!!");
                 model.addAttribute("noteid", noteid);
                 model.addAttribute("title", noteService.getNoteById(noteid).getTitle());

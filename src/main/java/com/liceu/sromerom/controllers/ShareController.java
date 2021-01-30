@@ -27,11 +27,16 @@ public class ShareController {
         if (noteid != null) {
             HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
+            model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("noteid", noteid);
-            model.addAttribute("users", userService.getAll(userid));
-            model.addAttribute("usersShared", userService.getSharedUsers(noteid));
+            model.addAttribute("users", userService.getUnsharedUsers(userid, noteid));
+            model.addAttribute("usersShared", noteService.getPermissionFromSharedUsers(noteid));
 
-            if (!noteService.isNoteOwner(userid, noteid)) {
+
+            if (noteService.isNoteOwner(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
+                model.addAttribute("owner", noteService.isNoteOwner(userid, noteid));
+                model.addAttribute("action", "/share");
+            } else {
                 //REDIRECT A RESTRICTED AREA
                 return "redirect:/restrictedArea";
             }
@@ -39,19 +44,25 @@ public class ShareController {
             //REDIRECT AL HOME
             return "redirect:/home";
         }
-
-        model.addAttribute("action", "/share");
         return "shares";
     }
 
     @PostMapping("/share")
-    public String postShare(@RequestParam("users[]") String [] toShare, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
+    public String postShare(@RequestParam("users[]") String[] toShare, @RequestParam(required = false) String permissionMode, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
         Long userid = (Long) request.getSession().getAttribute("userid");
         boolean noError = false;
 
         if (toShare != null && noteid != null && toShare.length > 0 && !userService.existsUserShare(noteid, userid, toShare)) {
             //noError = ns.shareNote(userid, noteid, sharedUsers);
-            noError = noteService.shareNote(userid, noteid, toShare);
+            System.out.println("-------------------------------------------------------------------------------------------------------");
+            System.out.println("Antesssssssssssssssssssssssss: " + permissionMode);
+            if (permissionMode == null) {
+                System.out.println("Es nullllllllllllllllllllllllllllllll");
+                permissionMode = "readmode";
+            }
+
+            System.out.println("Despueeeeeeeeeeeeeeeeeeeeeees: " + permissionMode);
+            noError = noteService.shareNote(userid, noteid, permissionMode, toShare);
         }
 
         if (noError) {
@@ -68,13 +79,15 @@ public class ShareController {
     @GetMapping("/deleteShare")
     public String getDeleteShare(@RequestParam("id") Long noteid, HttpServletRequest request, Model model) {
         if (noteid != null) {
-           Long userid = (Long) request.getSession().getAttribute("userid");
+            Long userid = (Long) request.getSession().getAttribute("userid");
+            model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("noteid", noteid);
-            model.addAttribute("users", userService.getAll(userid));
-            model.addAttribute("usersShared", userService.getSharedUsers(noteid));
+            model.addAttribute("users", userService.getSharedUsers(noteid));
+            model.addAttribute("usersShared", noteService.getPermissionFromSharedUsers(noteid));
 
-
-            if (!noteService.isNoteOwner(userid, noteid)) {
+            if (noteService.isNoteOwner(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
+                model.addAttribute("action", "/deleteShare");
+            } else {
                 //REDIRECT A RESTRICTED AREA
                 return "redirect:/restrictedArea";
             }
@@ -83,19 +96,18 @@ public class ShareController {
             return "redirect:/home";
         }
 
-        model.addAttribute("action", "/deleteShare");
         return "shares";
     }
 
     @PostMapping("/deleteShare")
-    public String postDeleteShare(@RequestParam("users[]") String [] toDeleteShare, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
+    public String postDeleteShare(@RequestParam("users[]") String[] toDeleteShare, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
         Long userid = (Long) request.getSession().getAttribute("userid");
         boolean noError = false;
-        if (noteid != null && toDeleteShare.length > 0 && noteService.isNoteOwner(userid, noteid) || noteService.isSharedNote(userid, noteid)) {
+        if (noteid != null && toDeleteShare.length > 0 && noteService.isNoteOwner(userid, noteid) || noteService.isSharedNote(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
             System.out.println("Es note owner y el ha compartido su nota!!!!!!!!!!!");
             //Eliminarem sempre i quan existeixi usuaris a eliminar el share i que existeixi un share amb aquells usuaris
             //Mirar metodo existsUserShare
-            if (toDeleteShare != null && userService.existsUserShare(noteid,userid, toDeleteShare)) {
+            if (toDeleteShare != null && userService.existsUserShare(noteid, userid, toDeleteShare)) {
                 System.out.println("Existe share con estos usuarios!!!!!!!!!!!!!!");
                 noError = noteService.deleteShareNote(userid, noteid, toDeleteShare);
             }
@@ -117,13 +129,36 @@ public class ShareController {
     @PostMapping("/deleteAllShare")
     public String deleteAllShare(@RequestParam Long noteid, HttpServletRequest request, Model model) {
         Long userid = (Long) request.getSession().getAttribute("userid");
-         if (noteid != null && userid != null) {
-             if (!noteService.isSharedNote(userid, noteid) && !noteService.isNoteOwner(userid, noteid)) {
-                 return "redirect:/restrictedArea";
-             }
+        if (noteid != null && userid != null) {
+            if (!noteService.isSharedNote(userid, noteid) && !noteService.isNoteOwner(userid, noteid)) {
+                return "redirect:/restrictedArea";
+            }
 
-              boolean noerror = noteService.deleteAllShareNote(userid, noteid);
-         }
+            boolean noerror = noteService.deleteAllShareNote(userid, noteid);
+        }
         return "redirect:/home";
+    }
+
+    @PostMapping("/updatePermission")
+    public String updatePermission(@RequestParam Long noteid, @RequestParam Long shareduserid, @RequestParam String permissionMode, HttpServletRequest request, Model model) {
+        Long userid = (Long) request.getSession().getAttribute("userid");
+        System.out.println("######################################################################");
+        System.out.println(noteid);
+        System.out.println(shareduserid);
+        System.out.println(permissionMode);
+        boolean noError = true;
+        if (noteid != null && userid != null) {
+            if (noteService.isNoteOwner(userid, noteid)) {
+                noError = noteService.updatePermissionMode(userid, shareduserid,noteid,permissionMode);
+            }
+        }
+
+        if (noError) {
+            //REDIRECT AL HOME PORQUE HA IDO BIEN
+            return "redirect:/share?id=" + noteid;
+        }
+
+        model.addAttribute("noError", false);
+        return "shares";
     }
 }

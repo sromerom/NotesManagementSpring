@@ -37,13 +37,17 @@ public class NoteServiceImpl implements NoteService {
     public List<RenderableNote> getNotesFromUser(long userid, int page) {
         Pageable topTen = PageRequest.of(page, LIMIT);
         List<RenderableNote> renderableNotes;
+        List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen);
+
+        /*
         List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
                 .stream().map(a -> a.getNote())
                 .collect(Collectors.toList());
+         */
         List<Note> allNotes = noteRepo.getAllNotesFromUser(userid, topTen);
 
         try {
-            renderableNotes = parseNoteToRenderable(allNotes, sharedNotes);
+            renderableNotes = parseNoteToRenderable(allNotes, sharedNotes, userid);
             return renderableNotes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,7 +63,7 @@ public class NoteServiceImpl implements NoteService {
         List<Note> createdNotes = noteRepo.findByUser_Userid(userid, topTen);
 
         if (createdNotes != null) {
-            createdNotes.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification())));
+            createdNotes.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification(), false)));
             return renderableNotes;
         }
 
@@ -145,10 +149,16 @@ public class NoteServiceImpl implements NoteService {
                     break;
             }
              */
+
+            List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen);
+
+            /*
             List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
                     .stream().map(a -> a.getNote())
                     .collect(Collectors.toList());
-            List<RenderableNote> renderableNotes = parseNoteToRenderable(notes, sharedNotes);
+
+             */
+            List<RenderableNote> renderableNotes = parseNoteToRenderable(notes, sharedNotes, userid);
             return renderableNotes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -206,13 +216,20 @@ public class NoteServiceImpl implements NoteService {
         String dateString = myDateObj.format(formatter);
         LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
 
-        if (isNoteOwner(userid, noteid)) {
+
+        //Owner = sromerom = 1 & note = 1
+        //Shared = pnegre = 2 & note = 1
+        if (isNoteOwner(userid, noteid) || hasWritePermission(userid, noteid)) {
             Note noteToUpdate = noteRepo.findById(noteid).get();
             noteToUpdate.setTitle(title);
             noteToUpdate.setBody(body);
             noteToUpdate.setLastModification(dateTime);
             Note updatedNote = noteRepo.save(noteToUpdate);
             if (updatedNote != null) return true;
+        }
+
+        SharedNote sharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid);
+        if (sharedNote != null) {
         }
         return false;
     }
@@ -229,18 +246,16 @@ public class NoteServiceImpl implements NoteService {
         }
 
         for (Note n : notesToDelete) {
-            /*
             if (sharedNoteRepo.existsByNote_Noteid(n.getNoteid())) {
                 List<String> listUsernames = new ArrayList<>();
                 userRepo.getUsersFromSharedNote(n.getNoteid())
                         .stream()
-                        .map(ne-> listUsernames.add(ne.getUsername()))
+                        .map(ne -> listUsernames.add(ne.getUsername()))
                         .collect(Collectors.toList());
                 String[] usernamesToDeleteShare = new String[listUsernames.size()];
                 listUsernames.toArray(usernamesToDeleteShare);
                 deleteShareNote(userid, n.getNoteid(), usernamesToDeleteShare);
             }
-             */
             noteRepo.delete(n);
         }
         return false;
@@ -257,11 +272,15 @@ public class NoteServiceImpl implements NoteService {
     public List<RenderableNote> getSharedNoteWithMe(long userid, int page) {
         Pageable topTen = PageRequest.of(page, 10);
         List<RenderableNote> renderableNotes = new ArrayList<>();
-        List<Note> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, topTen)
-                .stream().map(a -> a.getNote())
-                .collect(Collectors.toList());
+        List<SharedNote> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, topTen);
 
-        sharedNotesWithMe.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification())));
+        boolean writeable = false;
+        for (SharedNote sh : sharedNotesWithMe) {
+            if (sh.getPermissionMode().equals("writemode")) writeable = true;
+            renderableNotes.add(new RenderableNote(sh.getNote().getNoteid(), sh.getNote().getUser(), null, sh.getNote().getTitle(), sh.getNote().getBody(), sh.getNote().getCreationDate(), sh.getNote().getLastModification(), writeable));
+            writeable = false;
+        }
+
         return renderableNotes;
     }
 
@@ -269,14 +288,15 @@ public class NoteServiceImpl implements NoteService {
     public List<RenderableNote> getSharedNotes(long userid, int page) {
         List<RenderableNote> renderableNotes = new ArrayList<>();
         Pageable topTen = PageRequest.of(page, LIMIT);
-        List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
+        List<Note> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen)
                 .stream().map(a -> a.getNote())
+                .distinct()
                 .collect(Collectors.toList());
 
 
         for (Note n : sharedNotes) {
             List<User> sharedUsersFromNote = noteRepo.getUsersFromSharedNote(n.getNoteid());
-            renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), sharedUsersFromNote, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification()));
+            renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), sharedUsersFromNote, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification(), false));
         }
 
         return renderableNotes;
@@ -294,18 +314,22 @@ public class NoteServiceImpl implements NoteService {
 
     @Transactional
     @Override
-    public boolean shareNote(long userWhoShares, long noteid, String[] usernames) {
+    public boolean shareNote(long userWhoShares, long noteid, String permissionMode, String[] usernames) {
         Note noteForShare = noteRepo.findById(noteid).get();
         List<User> usersToShare = new ArrayList<>();
         //Si no existeix, ni entrarem al bucle
         if (noteForShare != null) {
             for (String username : usernames) {
-                long userid = userRepo.findUserByUsername(username).getUserid();
+                User userToShare = userRepo.findUserByUsername(username);
                 //Per guardar l'usuari al que compartirem, abans hem de comprovar si la nota que es vol compartir ja ho esta amb els usuaris introduits. Si no ho esta ho afegim
                 //a la llista
 
-                if (sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid) == null) {
-                    User user = userRepo.findById(userid).get();
+                //Si entre els usuaris trobam el usuari owner de la nota, no compartirem la nota
+                if (noteRepo.findNoteByNoteidAndUser_Userid(noteid, userToShare.getUserid()) != null) {
+                    return false;
+                }
+                if (sharedNoteRepo.findByUser_UseridAndNote_Noteid(userToShare.getUserid(), noteid) == null) {
+                    User user = userRepo.findById(userToShare.getUserid()).get();
                     usersToShare.add(user);
                 }
             }
@@ -315,6 +339,7 @@ public class NoteServiceImpl implements NoteService {
                 for (User u : usersToShare) {
                     User user = userRepo.findById(u.getUserid()).get();
                     SharedNote newSharedNote = new SharedNote();
+                    newSharedNote.setPermissionMode(permissionMode);
                     newSharedNote.setNote(noteForShare);
                     newSharedNote.setUser(user);
                     newSharedNote.setId(new SharedNoteCK(user.getUserid(), noteForShare.getNoteid()));
@@ -369,26 +394,21 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     @Override
     public boolean deleteAllShareNote(long userid, long noteid) {
-        Pageable topTen = PageRequest.of(0, 100);//Cambiar size!!!
-        List<SharedNote> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen);
-        List<SharedNote> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, topTen);
+        Pageable all = PageRequest.of(0, Integer.SIZE);
 
-        List<Note> parsedSharedNotes = new ArrayList<>();
-        List<Note> parsedSharedNotesWithMe = new ArrayList<>();
-
-        for (SharedNote sn : sharedNotes) {
-            parsedSharedNotes.add(sn.getNote());
-        }
-
-        for (SharedNote sn : sharedNotesWithMe) {
-            parsedSharedNotesWithMe.add(sn.getNote());
-        }
+        List<Note> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, all)
+                .stream().map(a -> a.getNote())
+                .distinct()
+                .collect(Collectors.toList());
+        List<Note> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, all)
+                .stream().map(a -> a.getNote())
+                .collect(Collectors.toList());
 
 
         boolean canDelete = false;
 
         //Primer comprovam que la nota que esta compartida es troba a les notes compartides "With Me"
-        for (Note n : parsedSharedNotesWithMe) {
+        for (Note n : sharedNotesWithMe) {
             if (n.getNoteid() == noteid) {
                 canDelete = true;
             }
@@ -401,7 +421,7 @@ public class NoteServiceImpl implements NoteService {
         }
 
         //Si la nota no ha estat compartida amb mi, farem una segona comprovacio amb les notes que jo he compartides
-        for (Note n : parsedSharedNotes) {
+        for (Note n : sharedNotes) {
             if (n.getUser().getUserid() == userid && n.getNoteid() == noteid) {
                 canDelete = true;
             }
@@ -415,18 +435,58 @@ public class NoteServiceImpl implements NoteService {
         return false;
     }
 
-    private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<Note> sharedNotes) throws Exception {
+    @Override
+    public boolean hasWritePermission(long userid, long noteid) {
+        SharedNote sharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid);
+        if (sharedNote.getPermissionMode().equals("writemode")) return true;
+        return false;
+    }
+
+    @Override
+    public List<SharedNote> getPermissionFromSharedUsers(long noteid) {
+        List<SharedNote> permissions = new ArrayList<>();
+        List<User> users = userRepo.getUsersFromSharedNote(noteid);
+        for (User user : users) {
+            SharedNote sharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(user.getUserid(), noteid);
+            permissions.add(sharedNote);
+        }
+
+        return permissions;
+    }
+
+    @Override
+    public boolean updatePermissionMode(long userid, long shareduserid, long noteid, String newPermission) {
+        SharedNote shareNoteToUpdate = sharedNoteRepo.findByUser_UseridAndNote_Noteid(shareduserid, noteid);
+        if (isNoteOwner(userid, noteid) && shareNoteToUpdate != null) {
+            shareNoteToUpdate.setPermissionMode(newPermission);
+            SharedNote updateSharedNote = sharedNoteRepo.save(shareNoteToUpdate);
+            if (updateSharedNote != null) return true;
+        }
+
+        return false;
+    }
+
+    private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<SharedNote> sharedNotes, long userid) throws Exception {
         List<RenderableNote> result = new ArrayList<>();
         for (Note note : allNotes) {
             List<User> sharedUsersFromNote = null;
             for (int j = 0; j < sharedNotes.size(); j++) {
-                if (sharedNotes.get(j).getNoteid() == note.getNoteid()) {
-                    sharedUsersFromNote = userRepo.getUsersFromSharedNote(sharedNotes.get(j).getNoteid());
+                if (sharedNotes.get(j).getNote().getNoteid() == note.getNoteid()) {
+                    sharedUsersFromNote = userRepo.getUsersFromSharedNote(sharedNotes.get(j).getNote().getNoteid());
                     sharedNotes.remove(j);
                     break;
                 }
             }
-            result.add(new RenderableNote(note.getNoteid(), note.getUser(), sharedUsersFromNote, note.getTitle(), note.getBody(), note.getCreationDate(), note.getLastModification()));
+
+
+            boolean writeable = false;
+            SharedNote sh = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, note.getNoteid());
+
+            if (sharedNoteRepo.existsByNote_Noteid(note.getNoteid()) && sh != null) {
+                if (sh.getPermissionMode().equals("writemode")) writeable = true;
+            }
+
+            result.add(new RenderableNote(note.getNoteid(), note.getUser(), sharedUsersFromNote, note.getTitle(), note.getBody(), note.getCreationDate(), note.getLastModification(), writeable));
         }
         return result;
     }

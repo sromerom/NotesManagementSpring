@@ -10,6 +10,8 @@ public interface UserService {
 
     List<User> getSharedUsers(long noteid);
 
+    List<User> getUnsharedUsers(long userid, long noteid);
+
     User getUserById(long userid);
 
     User getUserByUsername(String username);

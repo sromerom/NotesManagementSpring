@@ -13,7 +13,6 @@
     <%@ include file="parts/header.jsp" %>
 </head>
 <body>
-
 <c:if test="${noerror == false && action == '/share'}">
     <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
         The note could not be shared successfully
@@ -33,33 +32,80 @@
 <section id="container">
     <div>
         <h2>Users that you have shared for this note</h2>
-        <ul class="list-group">
-            <c:forEach var="user" items="${usersShared}">
-                <li class="list-group-item">${user.username}</li>
+        <table class="table table-striped table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Permission</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach var="sharedNote" items="${usersShared}">
+                <tr>
+                    <td>${sharedNote.user.username}</td>
+                    <c:choose>
+                        <c:when test="${(action == '/share') and (not empty owner) and (owner == 'true')}">
+                            <td>
+                                <form method="POST" action="${pageContext.request.contextPath}/updatePermission">
+                                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                                    <input type="hidden" name="noteid" value="${noteid}">
+                                    <input type="hidden" name="shareduserid" value="${sharedNote.user.userid}">
+                                    <select name="permissionMode" id="permissionMode2">
+                                        <c:choose>
+                                            <c:when test="${sharedNote.permissionMode == 'readmode'}">
+                                                <option selected="true" value="readmode">Read Mode</option>
+                                                <option value="writemode">Write Mode</option>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <option value="readmode">Read Mode</option>
+                                                <option selected="true" value="writemode">Write Mode</option>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </select>
+                                    <button type="submit"> Edit</button>
+                                </form>
+                            </td>
+                        </c:when>
+                        <c:otherwise>
+                            <td>${sharedNote.permissionMode}</td>
+                        </c:otherwise>
+                    </c:choose>
+                </tr>
             </c:forEach>
-        </ul>
+            </tbody>
+        </table>
         <c:if test="${action == '/deleteShare'}">
-            <button id="buttonToDelete" type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalDeleteAllShares">
+            <button id="buttonToDelete" type="button" class="btn btn-danger" data-toggle="modal"
+                    data-target="#modalDeleteAllShares">
                 Delete all shares
             </button>
         </c:if>
     </div>
+
     <div>
         <c:choose>
             <c:when test="${action == '/deleteShare'}">
                 <h2>Delete the users you have shared</h2>
+            <form id="formActionDelete" method="POST" action="${action}">
             </c:when>
             <c:otherwise>
                 <h2>Share this note with some users</h2>
+                <form id="formActionShare" method="POST" action="${action}">
             </c:otherwise>
         </c:choose>
-        <form method="POST" action="${action}">
-            <input type="hidden" id="noteid" name="noteid" value="${noteid}">
+
+            <input id="noteidInput" type="hidden" name="noteid" value="${noteid}">
             <select class="js-example-basic-multiple" name="users[]" multiple="multiple">
                 <c:forEach var="user" items="${users}">
                     <option value="${user.username}">${user.username}</option>
                 </c:forEach>
             </select>
+            <c:if test="${(action == '/share') and (not empty owner) and (owner == 'true')}">
+                <select name="permissionMode" id="permissionMode">
+                    <option value="readmode">Read Mode</option>
+                    <option value="writemode">Write Mode</option>
+                </select>
+            </c:if>
             <small id="shareHelpBlock" class="form-text text-muted">
                 Remember that you cannot delete or create the share of a user that already exists.
             </small>
@@ -85,7 +131,8 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="titleModalDeleteShares">Are you sure to delete all shares for this note?</h5>
+                <h5 class="modal-title" id="titleModalDeleteShares">Are you sure to delete all shares for this
+                    note?</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -101,10 +148,52 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="titleModalDeleteShares2">Are you sure to delete yourself? You will not be able to see this note anymore.</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="accept" type="button" class="btn btn-danger">Yes, I don't want this note anymore.</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input id="username" type="hidden" name="username" value="${username}">
 <script>
     $(document).ready(function () {
         $('.js-example-basic-multiple').select2();
     });
+
+    if (document.querySelector("#formActionDelete")) {
+        document.querySelector("#formActionDelete").addEventListener("submit", function(e) {
+            console.log("Submit!!!")
+            e.preventDefault();
+            const username = document.querySelector("#username").value;
+            const selected =  $('.js-example-basic-multiple').select2("val");
+            let check = false;
+            selected.forEach(u => {
+                if (u === username) {
+                    check = true;
+                    $('#exampleModal').modal('show')
+                }
+            })
+            if (!check) {
+                document.querySelector("#formActionDelete").submit();
+            }
+        })
+
+        document.querySelector("#accept").addEventListener("click", function() {
+            document.querySelector("#formActionDelete").submit();
+        })
+    }
 </script>
 </body>
 </html>

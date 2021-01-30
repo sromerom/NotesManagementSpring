@@ -1,6 +1,7 @@
 package com.liceu.sromerom.services;
 
 import com.liceu.sromerom.entities.Note;
+import com.liceu.sromerom.entities.SharedNote;
 import com.liceu.sromerom.utils.RenderableNote;
 
 import java.util.List;
@@ -40,9 +41,15 @@ public interface NoteService {
 
     long getLengthSharedNotes(long userid);
 
-    boolean shareNote(long userWhoShares, long noteid, String[] usernames);
+    boolean shareNote(long userWhoShares, long noteid, String permissionMode, String[] usernames);
 
     boolean deleteShareNote(long userWhoDeleteShare, long noteid, String[] usernames);
 
     boolean deleteAllShareNote(long userid, long noteid);
+
+    boolean hasWritePermission(long userid, long noteid);
+
+    List<SharedNote> getPermissionFromSharedUsers(long noteid);
+
+    boolean updatePermissionMode(long userid, long shareduserid, long noteid, String newPermission);
 }
