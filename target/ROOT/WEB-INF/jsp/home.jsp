@@ -55,24 +55,124 @@
                                 <option value="ownerNotes">Created Notes</option>
                                 <option selected="true" value="sharedNotesWithMe">Shared Notes With You</option>
                                 <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
                             </c:when>
+
                             <c:when test="${typeNote == 'sharedNotesByYou'}">
                                 <option disabled="disabled">Select a type of note to filter</option>
                                 <option value="ownerNotes">Created Notes</option>
                                 <option value="sharedNotesWithMe">Shared Notes With You</option>
                                 <option selected="true" value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
                             </c:when>
+
                             <c:when test="${typeNote == 'ownerNotes'}">
                                 <option disabled="disabled">Select a type of note to filter</option>
                                 <option selected="true" value="ownerNotes">Created Notes</option>
                                 <option value="sharedNotesWithMe">Shared Notes With You</option>
                                 <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+
+
+                            <c:when test="${typeNote == 'titleDESC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option selected="true" value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+                            <c:when test="${typeNote == 'titleASC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option selected="true" value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+                            <c:when test="${typeNote == 'creationDateDESC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option selected="true" value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+                            <c:when test="${typeNote == 'creationDateASC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option selected="true" value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+                            <c:when test="${typeNote == 'lastModificationDESC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option selected="true" value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
+                            </c:when>
+                            <c:when test="${typeNote == 'lastModificationASC'}">
+                                <option disabled="disabled">Select a type of note to filter</option>
+                                <option value="ownerNotes">Created Notes</option>
+                                <option value="sharedNotesWithMe">Shared Notes With You</option>
+                                <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option selected="true" value="lastModificationASC">Filter by last modification ASC</option>
                             </c:when>
                             <c:otherwise>
                                 <option selected="true" disabled="disabled">Select a type of note to filter</option>
                                 <option value="ownerNotes">Created Notes</option>
                                 <option value="sharedNotesWithMe">Shared Notes With You</option>
                                 <option value="sharedNotesByYou">Shared Notes by you</option>
+                                <option value="titleDESC">Filter by title DESC</option>
+                                <option value="titleASC">Filter by title ASC</option>
+                                <option value="creationDateDESC">Filter by creation date DESC</option>
+                                <option value="creationDateASC">Filter by creation date ASC</option>
+                                <option value="lastModificationDESC">Filter by last modification DESC</option>
+                                <option value="lastModificationASC">Filter by last modification ASC</option>
                             </c:otherwise>
                         </c:choose>
                     </select>

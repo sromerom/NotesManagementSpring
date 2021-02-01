@@ -9,12 +9,24 @@
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <c:if test="${noerror == false}">
-    <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
-        The profile could not be edited successfully
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <c:choose>
+        <c:when test="${action == 'edit'}">
+            <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
+                The profile could not be edited successfully
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
+                The profile could not be deleted successfully
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </c:otherwise>
+    </c:choose>
 </c:if>
 <div class="container">
     <div class="row flex-lg-nowrap">
@@ -80,45 +92,49 @@
                                                         </div>
                                                     </div>
                                                 </form>
-                                                <form class="form" novalidate="" method="POST"
-                                                      action="${pageContext.request.contextPath}/editProfile">
-                                                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
-                                                    <div class="mb-2"><b>Change Password</b></div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="form-group">
-                                                                <label>Current Password</label>
-                                                                <input class="form-control" type="password"
-                                                                       name="currentPassword" placeholder="••••••">
+                                                <c:if test="${typeUser == 'NATIVE'}">
+                                                    <form class="form" novalidate="" method="POST"
+                                                          action="${pageContext.request.contextPath}/editProfile">
+                                                        <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                                                        <div class="mb-2"><b>Change Password</b></div>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <label>Current Password</label>
+                                                                    <input class="form-control" type="password"
+                                                                           name="currentPassword" placeholder="••••••">
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="form-group">
-                                                                <label>New Password</label>
-                                                                <input class="form-control" type="password"
-                                                                       name="newPass"
-                                                                       placeholder="••••••">
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <label>New Password</label>
+                                                                    <input class="form-control" type="password"
+                                                                           name="newPass"
+                                                                           placeholder="••••••">
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="form-group">
-                                                                <label>Confirm <span
-                                                                        class="d-none d-xl-inline">Password</span></label>
-                                                                <input class="form-control" type="password"
-                                                                       name="newPassConfirm" placeholder="••••••"></div>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group">
+                                                                    <label>Confirm <span
+                                                                            class="d-none d-xl-inline">Password</span></label>
+                                                                    <input class="form-control" type="password"
+                                                                           name="newPassConfirm" placeholder="••••••">
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col d-flex justify-content-end">
-                                                            <button class="btn btn-primary" type="submit">Save Changes
-                                                            </button>
+                                                        <div class="row">
+                                                            <div class="col d-flex justify-content-end">
+                                                                <button class="btn btn-primary" type="submit">Save
+                                                                    Changes
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </form>
+                                                    </form>
+                                                </c:if>
                                             </div>
                                         </div>
                                     </div>
@@ -135,8 +151,18 @@
                                 <form method="POST" action="${pageContext.request.contextPath}/unlogin" class="inline">
                                     <input type="hidden" name="_csrftoken" value="${csrfToken}">
                                     <button type="submit" class="btn btn-block btn-secondary">
-                                        <i class="fa fa-sign-out"></i>
+                                        <i class="fas fa-sign-out-alt"></i>
                                         <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="px-xl-3">
+                                <form id="deleteUserForm" method="POST"
+                                      action="${pageContext.request.contextPath}/deleteUser" class="inline">
+                                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-user-slash"></i>
+                                        Delete your user
                                     </button>
                                 </form>
                             </div>
@@ -147,6 +173,37 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteUser" tabindex="-1" role="dialog" aria-labelledby="deleteUser"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUser">Are you sure delete this account? You will lose all the
+                    notes.</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="accept" type="button" class="btn btn-danger">I'm completely sure. I want delete my account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <%@ include file="parts/footer.jsp" %>
+<script>
+    document.querySelector("#deleteUserForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        console.log("Submit!!!");
+        $('#confirmDeleteUser').modal('show')
+    })
+
+    document.querySelector("#accept").addEventListener("click", function () {
+        document.querySelector("#deleteUserForm").submit();
+    })
+</script>
 </body>
 </html>

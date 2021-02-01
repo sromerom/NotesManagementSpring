@@ -18,6 +18,10 @@ public class Filter {
                 return "filterByDate";
             }
 
+            if (title.equals("") && initDate.equals("") && endDate.equals("")) {
+                return "defaultFilter";
+            }
+
         }
         return null;
     }

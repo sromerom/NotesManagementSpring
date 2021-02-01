@@ -13,8 +13,10 @@ E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\controllers\UserController.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\utils\RenderableNote.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\entities\SharedNote.java
+E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\utils\PermissionMode.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\config\HibernateConfig.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\controllers\MainController.java
+E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\utils\TypeUser.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\interceptors\LoginInterceptor.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\entities\SharedNoteCK.java
 E:\Fp informatica\CFGS 2n any REP\PracticasEntornServidor\NotesManagementSpring\src\main\java\com\liceu\sromerom\services\GoogleService.java

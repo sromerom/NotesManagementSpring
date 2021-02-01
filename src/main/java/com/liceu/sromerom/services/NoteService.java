@@ -15,7 +15,7 @@ public interface NoteService {
 
     long getCreatedNotesLength(long userid);
 
-    List<RenderableNote> filter(long userid, String type, String search, String initDate, String endDate, int page);
+    List<RenderableNote> filter(long userid, String optionSelect, String search, String initDate, String endDate, int page);
 
     Note getNoteById(long noteid);
 

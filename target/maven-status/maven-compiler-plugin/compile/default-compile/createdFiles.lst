@@ -4,6 +4,7 @@ com\liceu\sromerom\interceptors\LoginInterceptor.class
 com\liceu\sromerom\services\GoogleService.class
 com\liceu\sromerom\entities\User.class
 com\liceu\sromerom\entities\SharedNoteCK.class
+com\liceu\sromerom\utils\TypeUser.class
 com\liceu\sromerom\repos\SharedNoteRepo.class
 com\liceu\sromerom\controllers\MainController.class
 com\liceu\sromerom\utils\RenderableNote.class
@@ -21,6 +22,7 @@ com\liceu\sromerom\repos\NoteRepo.class
 com\liceu\sromerom\controllers\ShareController.class
 com\liceu\sromerom\repos\UserRepo.class
 com\liceu\sromerom\config\AppConfig.class
+com\liceu\sromerom\utils\PermissionMode.class
 com\liceu\sromerom\interceptors\CheckCsrfTokenFilter.class
 com\liceu\sromerom\config\AnnotationWebAppInitializer.class
 com\liceu\sromerom\entities\SharedNote.class

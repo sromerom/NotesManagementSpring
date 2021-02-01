@@ -1,7 +1,9 @@
 package com.liceu.sromerom.services;
 
 
+
 import com.liceu.sromerom.entities.User;
+import com.liceu.sromerom.utils.TypeUser;
 
 import java.util.List;
 
@@ -15,11 +17,11 @@ public interface UserService {
     User getUserById(long userid);
 
     User getUserByUsername(String username);
-    User getUserByEmail(String email);
-
+    //User getUserByEmail(String email);
+    User getUserByEmailAndTypeUser(String email, TypeUser typeUser);
     String createNewUsernameFromEmail(String email);
 
-    boolean createUser(String email, String username, String password, boolean googleUser);
+    boolean createUser(String email, String username, String password, TypeUser typeUser);
 
     boolean existsUserShare(long noteid, long userid, String[] sharedUsers);
 
@@ -34,5 +36,7 @@ public interface UserService {
     boolean editPassword(long userid, String password);
 
     boolean editDataInfo(long userid, String email, String username);
+
+    boolean deleteUser(long userid);
 
 }

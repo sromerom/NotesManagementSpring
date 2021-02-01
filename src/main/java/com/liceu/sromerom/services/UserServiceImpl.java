@@ -5,6 +5,7 @@ import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.repos.NoteRepo;
 import com.liceu.sromerom.repos.UserRepo;
 import com.liceu.sromerom.utils.HashUtil;
+import com.liceu.sromerom.utils.TypeUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,19 +82,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepo.findUserByEmail(email);
+    public User getUserByEmailAndTypeUser(String email, TypeUser typeUser) {
+        return userRepo.findByEmailAndTypeUser(email, typeUser);
     }
+
+    //@Override
+    //public User getUserByEmail(String email) {
+        //return userRepo.findUserByEmail(email);
+    //}
 
     @Override
     public String createNewUsernameFromEmail(String email) {
         //sromerom@esliceu.net
-        int min = 999;
-        int max = 10000;
+        final int MIN = 999;
+        final int MAX = 10000;
         String newUsername = email.split("@")[0];
         User validateUsername = userRepo.findUserByUsername(newUsername);
         while (validateUsername != null) {
-            int randomNumber = (int)(Math.random() * (max - min + 1) + min);
+            int randomNumber = (int)(Math.random() * (MAX - MIN + 1) + MIN);
             newUsername += randomNumber;
             validateUsername = userRepo.findUserByUsername(newUsername);
         }
@@ -102,14 +108,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public boolean createUser(String email, String username, String password, boolean googleUser) {
+    public boolean createUser(String email, String username, String password, TypeUser typeUser) {
         User validateUsername = userRepo.findUserByUsername(username);
         if (validateUsername == null) {
             System.out.println("Entras aqui???????????????????");
             try {
                 User newUser = new User();
                 String generatedSecuredPassword;
-                if (googleUser) {
+                if (!typeUser.equals(TypeUser.NATIVE)) {
                     generatedSecuredPassword = null;
                 } else {
                     generatedSecuredPassword = HashUtil.generatePasswordHash(password);
@@ -117,7 +123,7 @@ public class UserServiceImpl implements UserService {
                 newUser.setEmail(email);
                 newUser.setUsername(username);
                 newUser.setPassword(generatedSecuredPassword);
-                newUser.setGoogleUser(googleUser);
+                newUser.setTypeUser(typeUser);
                 User insertedUser = userRepo.save(newUser);
                 System.out.println("Ha salido bien??????????????????????: " + insertedUser);
                 if (insertedUser != null) return true;
@@ -193,7 +199,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             User validateUsername = userRepo.findUserByUsername(username);
-            User validateEmail = userRepo.findUserByEmail(email);
+            User validateEmail = userRepo.findByEmailAndTypeUser(email, TypeUser.NATIVE);
             //Si compleix tots els requisits que s'ha de seguir per fer un registre, retornarem true
             if (password.equals(password2) && validateUsername == null && validateEmail == null && passwordMatch && emailMatch && usernameMatch) {
                 return true;
@@ -210,7 +216,7 @@ public class UserServiceImpl implements UserService {
         try {
 
             User user = userRepo.findById(userid).get();
-            User validateEmail = userRepo.findUserByEmail(email);
+            User validateEmail = userRepo.findByEmailAndTypeUser(email, TypeUser.NATIVE);
             User validateUsername = userRepo.findUserByUsername(username);
             if (email != null && user != null) {
                 //Si el email introduit no es igual al seu i ja existeix, retornam false ja que no podem tenir email iguals
@@ -259,8 +265,11 @@ public class UserServiceImpl implements UserService {
     public boolean editPassword(long userid, String password) {
         User user = userRepo.findById(userid).get();
         user.setPassword(password);
-        User updateUser = userRepo.save(user);
-        if (updateUser != null) return true;
+
+        if (user.getTypeUser().equals(TypeUser.NATIVE)) {
+            User updateUser = userRepo.save(user);
+            if (updateUser != null) return true;
+        }
         return false;
     }
 
@@ -272,6 +281,17 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         User updateUser = userRepo.save(user);
         if (updateUser != null) return true;
+        return false;
+    }
+
+    @Override
+    public boolean deleteUser(long userid) {
+        User userToDelete = userRepo.findById(userid).get();
+        if (userToDelete != null) {
+            userRepo.delete(userToDelete);
+            return true;
+        }
+
         return false;
     }
 }

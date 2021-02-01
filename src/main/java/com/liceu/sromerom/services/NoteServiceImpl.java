@@ -8,6 +8,7 @@ import com.liceu.sromerom.repos.NoteRepo;
 import com.liceu.sromerom.repos.SharedNoteRepo;
 import com.liceu.sromerom.repos.UserRepo;
 import com.liceu.sromerom.utils.Filter;
+import com.liceu.sromerom.utils.PermissionMode;
 import com.liceu.sromerom.utils.RenderableNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -23,7 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class NoteServiceImpl implements NoteService {
 
-    public final static short LIMIT = 10;
+    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    final static short LIMIT = 10;
+    Pageable all = PageRequest.of(0, Integer.SIZE);
     @Autowired
     NoteRepo noteRepo;
 
@@ -81,77 +85,94 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<RenderableNote> filter(long userid, String type, String search, String initDate, String endDate, int page) {
-        System.out.println(type);
+    public List<RenderableNote> filter(long userid, String optionSelect, String search, String initDate, String endDate, int page) {
+        if (optionSelect == null) optionSelect = "";
+        if (search == null) search = "";
+        if (initDate == null) initDate = "";
+        if (endDate == null) endDate = "";
+
+        System.out.println("optionSelect: " + optionSelect);
         System.out.println("search: " + search);
         System.out.println("initDate " + initDate);
         System.out.println("endDate: " + endDate);
+
         List<Note> notes;
         try {
             Pageable topTen = PageRequest.of(page, LIMIT);
             if (!Filter.checkTypeFilter(search, initDate, endDate).equals("filterByDate")) {
                 System.out.println("Busqueda sin fechas!!!!!!!!!");
                 initDate = "1970-01-01 00:00:00";
-                endDate = "2021-01-30 00:00:00";
+                endDate = "2021-09-08 23:59:59";
+                //endDate = Instant.now().toString();
+                System.out.println(endDate);
+            } else {
+                //ToUniversalTime()
+                LocalDateTime initDateLDT = LocalDateTime.parse(initDate, formatter);
+                LocalDateTime endDateLDT = LocalDateTime.parse(endDate, formatter);
+                initDate = initDateLDT.minusHours(1).toString();
+                endDate = endDateLDT.minusHours(1).toString();
             }
 
-            if (type == null) type = "";
-
-            switch (type) {
+            switch (optionSelect) {
                 case "sharedNotesWithMe":
                     System.out.println("Filtramos en notas compartidas contigo!!");
                     notes = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, topTen)
                             .stream().map(a -> a.getNote())
+                            .distinct()
                             .collect(Collectors.toList());
                     break;
                 case "sharedNotesByYou":
                     System.out.println("Filtramos en notas compartidas por ti!!");
                     notes = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, topTen)
                             .stream().map(a -> a.getNote())
+                            .distinct()
                             .collect(Collectors.toList());
                     break;
                 case "ownerNotes":
                     System.out.println("Filtramos en notas creadas!!");
                     notes = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, topTen);
                     break;
+                case "titleDESC":
+                    System.out.println("Filtramos por titulo descendente");
+                    notes = noteRepo.filterOrderByTitleDESC(userid, search, initDate, endDate, topTen);
+                    break;
+                case "titleASC":
+                    System.out.println("Filtramos por titulo ascendente");
+                    notes = noteRepo.filterOrderByTitleASC(userid, search, initDate, endDate, topTen);
+                    break;
+                case "creationDateDESC":
+                    System.out.println("Filtramos por creationDate desc");
+                    notes = noteRepo.filterOrderByCreationDateDESC(userid, search, initDate, endDate, topTen);
+                    break;
+                case "creationDateASC":
+                    System.out.println("Filtramos por creationDate asc");
+                    notes = noteRepo.filterOrderByCreationDateASC(userid, search, initDate, endDate, topTen);
+                    break;
+                case "lastModificationDESC":
+                    System.out.println("Filtramos por lastModification desc");
+                    notes = noteRepo.filterOrderByLastModificationDESC(userid, search, initDate, endDate, topTen);
+                    break;
+                case "lastModificationASC":
+                    System.out.println("Filtramos por lastModification asc");
+                    notes = noteRepo.filterOrderByLastModificationASC(userid, search, initDate, endDate, topTen);
+                    break;
                 default:
+                    optionSelect = "default";
                     System.out.println("Filtramos en todas las notas!!");
                     notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
                     break;
             }
 
-
-            //List<Note> createsNoteFilter = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, topTen);
-            //List<Note> sharedNoteFilter = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, topTen);
-            //List<Note> sharedNoteWithMeFilter = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, topTen);
-            //List<Note> notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
-            System.out.println("Notas normales----------------------------------------------------------------------------------------------");
-            //System.out.println(notes.toString());
-            System.out.println("-----------------------------------------------------");
-            System.out.println("Notas creades----------------------------------------------------------------------------------------------");
-            //System.out.println(createsNoteFilter.toString());
-            //System.out.println(sharedNoteFilter.toString());
-            //System.out.println(sharedNoteWithMeFilter.toString());
-            System.out.println();
-            System.out.println("-----------------------------------------------------");
             /*
-            switch (Filter.checkTypeFilter(search, initDate, endDate)) {
-                case "filterByTitle":
-                    notes = noteRepo.filterNotesBySearch(userid, search, topTen);
-                    break;
-                case "filterByDate":
-                    System.out.println("initDate: " + initDate);
-                    System.out.println("endDate: " + endDate);
-                    notes = noteRepo.filterNotesByDate(userid, initDate, endDate, topTen);
-                    break;
-                case "filterAll":
-                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
-                    break;
-            }
+            List<Note> notesDistinct = sharedNoteRepo.getSharedNotesByUserid(userid, topTen)
+                    .stream().map(a -> a.getNote())
+                    .distinct()
+                    .collect(Collectors.toList());
+
              */
 
-            List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen);
-
+            List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, all);
+            System.out.println("sharedNotes" + sharedNoteRepo.getSharedNotesByUserid(userid, all));
             /*
             List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
                     .stream().map(a -> a.getNote())
@@ -189,10 +210,11 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     @Override
     public boolean addNote(long userid, String title, String body) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime myDateObj = LocalDateTime.now();
         String dateString = myDateObj.format(formatter);
         LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+        System.out.println("Esta es la fecha con la que se añadira la nota!!!!!!!!!!!!!!!!");
+        System.out.println(dateTime.toString());
 
         Note newNote = new Note();
         User userOwner = userRepo.findById(userid).get();
@@ -211,7 +233,6 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     @Override
     public boolean editNote(long userid, long noteid, String title, String body) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime myDateObj = LocalDateTime.now();
         String dateString = myDateObj.format(formatter);
         LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
@@ -276,7 +297,7 @@ public class NoteServiceImpl implements NoteService {
 
         boolean writeable = false;
         for (SharedNote sh : sharedNotesWithMe) {
-            if (sh.getPermissionMode().equals("writemode")) writeable = true;
+            if (sh.getPermissionMode().equals(PermissionMode.WRITEMODE)) writeable = true;
             renderableNotes.add(new RenderableNote(sh.getNote().getNoteid(), sh.getNote().getUser(), null, sh.getNote().getTitle(), sh.getNote().getBody(), sh.getNote().getCreationDate(), sh.getNote().getLastModification(), writeable));
             writeable = false;
         }
@@ -317,6 +338,20 @@ public class NoteServiceImpl implements NoteService {
     public boolean shareNote(long userWhoShares, long noteid, String permissionMode, String[] usernames) {
         Note noteForShare = noteRepo.findById(noteid).get();
         List<User> usersToShare = new ArrayList<>();
+        PermissionMode permissionModeEnum = null;
+
+        System.out.println("Los permisos que quiere...");
+        System.out.println(permissionMode + " =? " + PermissionMode.READMODE.toString());
+        if(permissionMode.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
+            permissionModeEnum = PermissionMode.READMODE;
+        }
+        if(permissionMode.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
+            permissionModeEnum = PermissionMode.WRITEMODE;
+        }
+
+        if (permissionMode == null) return false;
+
+
         //Si no existeix, ni entrarem al bucle
         if (noteForShare != null) {
             for (String username : usernames) {
@@ -339,7 +374,7 @@ public class NoteServiceImpl implements NoteService {
                 for (User u : usersToShare) {
                     User user = userRepo.findById(u.getUserid()).get();
                     SharedNote newSharedNote = new SharedNote();
-                    newSharedNote.setPermissionMode(permissionMode);
+                    newSharedNote.setPermissionMode(permissionModeEnum);
                     newSharedNote.setNote(noteForShare);
                     newSharedNote.setUser(user);
                     newSharedNote.setId(new SharedNoteCK(user.getUserid(), noteForShare.getNoteid()));
@@ -394,8 +429,6 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     @Override
     public boolean deleteAllShareNote(long userid, long noteid) {
-        Pageable all = PageRequest.of(0, Integer.SIZE);
-
         List<Note> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, all)
                 .stream().map(a -> a.getNote())
                 .distinct()
@@ -438,7 +471,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public boolean hasWritePermission(long userid, long noteid) {
         SharedNote sharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid);
-        if (sharedNote.getPermissionMode().equals("writemode")) return true;
+        if (sharedNote.getPermissionMode().equals(PermissionMode.WRITEMODE)) return true;
         return false;
     }
 
@@ -456,9 +489,19 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public boolean updatePermissionMode(long userid, long shareduserid, long noteid, String newPermission) {
+        PermissionMode permissionMode = null;
+        if(newPermission.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
+            permissionMode = PermissionMode.READMODE;
+        }
+        if(newPermission.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
+            permissionMode = PermissionMode.WRITEMODE;
+        }
+
+        if (permissionMode == null) return false;
+
         SharedNote shareNoteToUpdate = sharedNoteRepo.findByUser_UseridAndNote_Noteid(shareduserid, noteid);
         if (isNoteOwner(userid, noteid) && shareNoteToUpdate != null) {
-            shareNoteToUpdate.setPermissionMode(newPermission);
+            shareNoteToUpdate.setPermissionMode(permissionMode);
             SharedNote updateSharedNote = sharedNoteRepo.save(shareNoteToUpdate);
             if (updateSharedNote != null) return true;
         }
@@ -468,25 +511,25 @@ public class NoteServiceImpl implements NoteService {
 
     private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<SharedNote> sharedNotes, long userid) throws Exception {
         List<RenderableNote> result = new ArrayList<>();
-        for (Note note : allNotes) {
+        for (Note note: allNotes) {
             List<User> sharedUsersFromNote = null;
-            for (int j = 0; j < sharedNotes.size(); j++) {
-                if (sharedNotes.get(j).getNote().getNoteid() == note.getNoteid()) {
-                    sharedUsersFromNote = userRepo.getUsersFromSharedNote(sharedNotes.get(j).getNote().getNoteid());
-                    sharedNotes.remove(j);
+            for (SharedNote sh : sharedNotes) {
+                if (sh.getNote().getNoteid().equals(note.getNoteid())) {
+                    sharedUsersFromNote = userRepo.getUsersFromSharedNote(sh.getNote().getNoteid());
+                    sharedNotes.remove(0);
                     break;
                 }
             }
-
 
             boolean writeable = false;
             SharedNote sh = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, note.getNoteid());
 
             if (sharedNoteRepo.existsByNote_Noteid(note.getNoteid()) && sh != null) {
-                if (sh.getPermissionMode().equals("writemode")) writeable = true;
+                if (sh.getPermissionMode().equals(PermissionMode.WRITEMODE)) writeable = true;
             }
 
             result.add(new RenderableNote(note.getNoteid(), note.getUser(), sharedUsersFromNote, note.getTitle(), note.getBody(), note.getCreationDate(), note.getLastModification(), writeable));
+
         }
         return result;
     }

@@ -1,5 +1,7 @@
 package com.liceu.sromerom.entities;
 
+import com.liceu.sromerom.utils.PermissionMode;
+
 import javax.persistence.*;
 
 
@@ -24,7 +26,11 @@ public class SharedNote {
     @JoinColumn(name = "note_noteid")
     private Note note;
 
-    private String permissionMode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "permission_mode")
+    private PermissionMode permissionMode;
+
 
     public SharedNoteCK getId() {
         return id;
@@ -50,22 +56,21 @@ public class SharedNote {
         this.note = note;
     }
 
-    public String getPermissionMode() {
+    public PermissionMode getPermissionMode() {
         return permissionMode;
     }
 
-    public void setPermissionMode(String permissionMode) {
+    public void setPermissionMode(PermissionMode permissionMode) {
         this.permissionMode = permissionMode;
     }
-
 
     @Override
     public String toString() {
         return "SharedNote{" +
                 "id=" + id +
-                ", user=" + user +
-                ", note=" + note +
-                ", permissionMode='" + permissionMode + '\'' +
+                ", user=" + user.getUserid() + user.getUsername() + user.getEmail() +
+                ", note=" + note.getNoteid() + note.getTitle() +
+                ", permissionMode=" + permissionMode +
                 '}';
     }
 }

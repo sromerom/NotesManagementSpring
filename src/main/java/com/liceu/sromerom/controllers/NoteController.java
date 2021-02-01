@@ -43,37 +43,19 @@ public class NoteController {
             currentPage = 1;
         }
 
-        //Filter per mostrar els tipus de nota (totes les notes juntes, notes creades, notes que t'han compartit i notes que has compartit)
-        if (typeNote != null && !typeNote.equals("")) {
-            if (typeNote.equals("sharedNotesWithMe")) {
-                model.addAttribute("typeNote", typeNote);
-                model.addAttribute("notes", noteService.getSharedNoteWithMe(userid, currentPage - 1));
-                totalPages = (int) Math.ceil(noteService.getLengthSharedNoteWithMe(userid) / PAGES_FOR_NOTE);
-            } else if (typeNote.equals("sharedNotesByYou")) {
-                model.addAttribute("typeNote", typeNote);
-                model.addAttribute("notes", noteService.getSharedNotes(userid, currentPage - 1));
-                totalPages = (int) Math.ceil(noteService.getLengthSharedNotes(userid) / PAGES_FOR_NOTE);
-            } else {
-                model.addAttribute("typeNote", typeNote);
-                model.addAttribute("notes", noteService.getCreatedNotes(userid, currentPage - 1));
-                totalPages = (int) Math.ceil(noteService.getCreatedNotesLength(userid) / PAGES_FOR_NOTE);
-            }
-        } else {
-            model.addAttribute("typeNote", "allNotes");
-            System.out.println("-----------------------------------------------------------------------");
-            System.out.println(noteService.getNotesFromUser(userid, currentPage - 1));
-            System.out.println("------------------------------------------------------------------------");
-            model.addAttribute("notes", noteService.getNotesFromUser(userid, currentPage - 1));
-            totalPages = (int) Math.ceil(noteService.getAllNotesLength(userid) / (PAGES_FOR_NOTE));
-        }
+        //Url amb els parametres titleFilter, initDate i endDate + typeNote
+        String filterURL = Filter.getURLFilter(typeNote, titleFilter, noteStart, noteEnd);
+        model.addAttribute("filterURL", filterURL);
 
-        //Aplicam els filtres de cerca ja sigui per date o per search de paraules clau
-        if (Filter.checkFilter(titleFilter, noteStart, noteEnd)) {
-            model.addAttribute("notes", noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
-            totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)).size() / (PAGES_FOR_NOTE));
-        }
+        model.addAttribute("notes", noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
+        totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)).size() / (PAGES_FOR_NOTE));
+
+        System.out.println("##############################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        System.out.println(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
+
+
         //Pasam a la vista tots els parametres corresponents amb la paginacio
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", totalPages + 1);
         model.addAttribute("currentPage", currentPage);
 
         return "home";

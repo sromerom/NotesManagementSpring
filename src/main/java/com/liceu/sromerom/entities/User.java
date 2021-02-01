@@ -1,35 +1,42 @@
 package com.liceu.sromerom.entities;
 
+import com.liceu.sromerom.utils.TypeUser;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Set;
 
+@Table(name = "user",
+        uniqueConstraints = { @UniqueConstraint( columnNames = { "email", "type_user" } ) } )
 @Entity(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
 
-    @Column(unique = true)
     private String email;
 
     @Column(unique = true)
     private String username;
     private String password;
 
-    private boolean isGoogleUser;
-    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_user")
+    private TypeUser typeUser;
+
+    //RELACIO 1-N amb notes
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
+    //RELACIO N-N amb notes
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
+
 
     public Long getUserid() {
         return userid;
@@ -63,6 +70,14 @@ public class User {
         this.password = password;
     }
 
+    public TypeUser getTypeUser() {
+        return typeUser;
+    }
+
+    public void setTypeUser(TypeUser typeUser) {
+        this.typeUser = typeUser;
+    }
+
     public Set<Note> getNotes() {
         return notes;
     }
@@ -86,14 +101,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", typeUser=" + typeUser +
                 '}';
-    }
-
-    public boolean isGoogleUser() {
-        return isGoogleUser;
-    }
-
-    public void setGoogleUser(boolean googleUser) {
-        isGoogleUser = googleUser;
     }
 }

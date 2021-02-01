@@ -52,13 +52,13 @@
                                     <input type="hidden" name="shareduserid" value="${sharedNote.user.userid}">
                                     <select name="permissionMode" id="permissionMode2">
                                         <c:choose>
-                                            <c:when test="${sharedNote.permissionMode == 'readmode'}">
-                                                <option selected="true" value="readmode">Read Mode</option>
-                                                <option value="writemode">Write Mode</option>
+                                            <c:when test="${sharedNote.permissionMode == 'READMODE'}">
+                                                <option selected="true" value="READMODE">Read Mode</option>
+                                                <option value="WRITEMODE">Write Mode</option>
                                             </c:when>
                                             <c:otherwise>
-                                                <option value="readmode">Read Mode</option>
-                                                <option selected="true" value="writemode">Write Mode</option>
+                                                <option value="READMODE">Read Mode</option>
+                                                <option selected="true" value="WRITEMODE">Write Mode</option>
                                             </c:otherwise>
                                         </c:choose>
                                     </select>
@@ -102,8 +102,8 @@
             </select>
             <c:if test="${(action == '/share') and (not empty owner) and (owner == 'true')}">
                 <select name="permissionMode" id="permissionMode">
-                    <option value="readmode">Read Mode</option>
-                    <option value="writemode">Write Mode</option>
+                    <option value="READMODE">Read Mode</option>
+                    <option value="WRITEMODE">Write Mode</option>
                 </select>
             </c:if>
             <small id="shareHelpBlock" class="form-text text-muted">
@@ -174,7 +174,6 @@
 
     if (document.querySelector("#formActionDelete")) {
         document.querySelector("#formActionDelete").addEventListener("submit", function(e) {
-            console.log("Submit!!!")
             e.preventDefault();
             const username = document.querySelector("#username").value;
             const selected =  $('.js-example-basic-multiple').select2("val");
