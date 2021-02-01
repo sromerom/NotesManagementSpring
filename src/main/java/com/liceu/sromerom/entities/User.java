@@ -38,6 +38,10 @@ public class User {
     private Set<SharedNote> sharedNotes;
 
 
+    //1-n version
+    @OneToMany(mappedBy = "user")
+    private Set<Version> versions;
+
     public Long getUserid() {
         return userid;
     }

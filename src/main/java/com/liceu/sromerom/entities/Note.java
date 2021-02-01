@@ -29,6 +29,11 @@ public class Note {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
 
+
+    //1-n version
+    @OneToMany(mappedBy = "note")
+    private Set<Version> versions;
+
     public Long getNoteid() {
         return noteid;
     }
@@ -85,6 +90,14 @@ public class Note {
         this.sharedNotes = sharedNotes;
     }
 
+    public Set<Version> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(Set<Version> versions) {
+        this.versions = versions;
+    }
+
     @Override
     public String toString() {
         return "Note{" +
@@ -93,6 +106,9 @@ public class Note {
                 ", body='" + body + '\'' +
                 ", creationDate=" + creationDate +
                 ", lastModification=" + lastModification +
+                ", user=" + user.getUsername() +
+                ", sharedNotes=" + sharedNotes +
+                ", versions=" + versions +
                 '}';
     }
 }

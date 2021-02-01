@@ -48,14 +48,10 @@ public class NoteController {
         model.addAttribute("filterURL", filterURL);
 
         model.addAttribute("notes", noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
-        totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)).size() / (PAGES_FOR_NOTE));
-
-        System.out.println("##############################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        System.out.println(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
-
+        totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, -1).size() / (PAGES_FOR_NOTE));
 
         //Pasam a la vista tots els parametres corresponents amb la paginacio
-        model.addAttribute("totalPages", totalPages + 1);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", currentPage);
 
         return "home";

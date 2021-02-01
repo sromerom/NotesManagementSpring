@@ -98,7 +98,14 @@ public class NoteServiceImpl implements NoteService {
 
         List<Note> notes;
         try {
-            Pageable topTen = PageRequest.of(page, LIMIT);
+
+            Pageable limitPage;
+            if (page == -1) {
+                limitPage = all;
+            } else {
+                limitPage = PageRequest.of(page, LIMIT);
+            }
+
             if (!Filter.checkTypeFilter(search, initDate, endDate).equals("filterByDate")) {
                 System.out.println("Busqueda sin fechas!!!!!!!!!");
                 initDate = "1970-01-01 00:00:00";
@@ -116,50 +123,50 @@ public class NoteServiceImpl implements NoteService {
             switch (optionSelect) {
                 case "sharedNotesWithMe":
                     System.out.println("Filtramos en notas compartidas contigo!!");
-                    notes = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, topTen)
+                    notes = sharedNoteRepo.filterSharedNotesWithMe(userid, search, initDate, endDate, limitPage)
                             .stream().map(a -> a.getNote())
                             .distinct()
                             .collect(Collectors.toList());
                     break;
                 case "sharedNotesByYou":
                     System.out.println("Filtramos en notas compartidas por ti!!");
-                    notes = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, topTen)
+                    notes = sharedNoteRepo.filterSharedNotes(userid, search, initDate, endDate, limitPage)
                             .stream().map(a -> a.getNote())
                             .distinct()
                             .collect(Collectors.toList());
                     break;
                 case "ownerNotes":
                     System.out.println("Filtramos en notas creadas!!");
-                    notes = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, limitPage);
                     break;
                 case "titleDESC":
                     System.out.println("Filtramos por titulo descendente");
-                    notes = noteRepo.filterOrderByTitleDESC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByTitleDESC(userid, search, initDate, endDate, limitPage);
                     break;
                 case "titleASC":
                     System.out.println("Filtramos por titulo ascendente");
-                    notes = noteRepo.filterOrderByTitleASC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByTitleASC(userid, search, initDate, endDate, limitPage);
                     break;
                 case "creationDateDESC":
                     System.out.println("Filtramos por creationDate desc");
-                    notes = noteRepo.filterOrderByCreationDateDESC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByCreationDateDESC(userid, search, initDate, endDate, limitPage);
                     break;
                 case "creationDateASC":
                     System.out.println("Filtramos por creationDate asc");
-                    notes = noteRepo.filterOrderByCreationDateASC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByCreationDateASC(userid, search, initDate, endDate, limitPage);
                     break;
                 case "lastModificationDESC":
                     System.out.println("Filtramos por lastModification desc");
-                    notes = noteRepo.filterOrderByLastModificationDESC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByLastModificationDESC(userid, search, initDate, endDate, limitPage);
                     break;
                 case "lastModificationASC":
                     System.out.println("Filtramos por lastModification asc");
-                    notes = noteRepo.filterOrderByLastModificationASC(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterOrderByLastModificationASC(userid, search, initDate, endDate, limitPage);
                     break;
                 default:
                     optionSelect = "default";
                     System.out.println("Filtramos en todas las notas!!");
-                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, topTen);
+                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, limitPage);
                     break;
             }
 
