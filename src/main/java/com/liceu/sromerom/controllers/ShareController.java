@@ -148,14 +148,13 @@ public class ShareController {
         System.out.println(permissionMode);
         boolean noError = true;
         if (noteid != null && userid != null) {
-            if (noteService.isNoteOwner(userid, noteid)) {
-                noError = noteService.updatePermissionMode(userid, shareduserid,noteid,permissionMode);
-            }
+            noError = noteService.updatePermissionMode(userid, shareduserid, noteid, permissionMode);
         }
 
         if (noError) {
             //REDIRECT AL HOME PORQUE HA IDO BIEN
-            return "redirect:/share?id=" + noteid;
+            //return "redirect:/share?id=" + noteid;
+            return "redirect:/home";
         }
 
         model.addAttribute("noError", false);

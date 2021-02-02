@@ -88,8 +88,6 @@
                                 <option value="lastModificationDESC">Filter by last modification DESC</option>
                                 <option value="lastModificationASC">Filter by last modification ASC</option>
                             </c:when>
-
-
                             <c:when test="${typeNote == 'titleDESC'}">
                                 <option disabled="disabled">Select a type of note to filter</option>
                                 <option value="ownerNotes">Created Notes</option>
@@ -371,15 +369,13 @@
                     </c:when>
                     <c:otherwise>
                         <%-- #################### Notes compartides amb tu #################### --%>
-                        <div class="card sharedNotesWithMe"
-                             style="width: 18rem; background-color: #f15946; color: white">
+                        <div class="card sharedNotesWithMe" style="width: 18rem; background-color: #f15946; color: white;<c:if test="${note.writeable eq true}"> border: 2px solid #f9c22e;"</c:if>">
                             <div class="card-body">
                                 <h5 class="card-title">${note.title}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">Created By ${note.owner.username}</h6>
                                 <p class="card-text"
                                    style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;overflow: hidden;">${util.cleanBody(note.body)}</p>
-                                <div class="optionsButtons"
-                                     <c:if test="${note.writeable eq true}">style="background-color: #f9c22e; border: 2px solid black; padding: 8px;" </c:if>>
+                                <div class="optionsButtons">
                                     <c:choose>
                                         <c:when test="${note.writeable eq true}">
                                             <a href="${pageContext.request.contextPath}/edit?id=${note.noteid}">

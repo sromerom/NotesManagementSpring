@@ -1,0 +1,23 @@
+#containerView {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+#renderNote {
+    flex-basis: 80%;
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+#infoVersion {
+    flex-basis: 20%;
+}
+

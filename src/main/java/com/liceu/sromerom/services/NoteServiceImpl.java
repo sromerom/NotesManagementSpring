@@ -1,12 +1,10 @@
 package com.liceu.sromerom.services;
 
-import com.liceu.sromerom.entities.Note;
-import com.liceu.sromerom.entities.SharedNote;
-import com.liceu.sromerom.entities.SharedNoteCK;
-import com.liceu.sromerom.entities.User;
+import com.liceu.sromerom.entities.*;
 import com.liceu.sromerom.repos.NoteRepo;
 import com.liceu.sromerom.repos.SharedNoteRepo;
 import com.liceu.sromerom.repos.UserRepo;
+import com.liceu.sromerom.repos.VersionRepo;
 import com.liceu.sromerom.utils.Filter;
 import com.liceu.sromerom.utils.PermissionMode;
 import com.liceu.sromerom.utils.RenderableNote;
@@ -16,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -36,6 +33,9 @@ public class NoteServiceImpl implements NoteService {
 
     @Autowired
     SharedNoteRepo sharedNoteRepo;
+
+    @Autowired
+    VersionRepo versionRepo;
 
     @Override
     public List<RenderableNote> getNotesFromUser(long userid, int page) {
@@ -248,17 +248,28 @@ public class NoteServiceImpl implements NoteService {
         //Owner = sromerom = 1 & note = 1
         //Shared = pnegre = 2 & note = 1
         if (isNoteOwner(userid, noteid) || hasWritePermission(userid, noteid)) {
+            Version addVersion = new Version();
             Note noteToUpdate = noteRepo.findById(noteid).get();
-            noteToUpdate.setTitle(title);
-            noteToUpdate.setBody(body);
-            noteToUpdate.setLastModification(dateTime);
-            Note updatedNote = noteRepo.save(noteToUpdate);
-            if (updatedNote != null) return true;
+            User whoUpdate = userRepo.findById(userid).get();
+
+            //Afegim la info actual de la nota a una versio nova
+            addVersion.setTitle(noteToUpdate.getTitle());
+            addVersion.setBody(noteToUpdate.getBody());
+            addVersion.setCreationDate(dateTime);
+            addVersion.setNote(noteToUpdate);
+            addVersion.setUser(whoUpdate);
+            Version versionAdded = versionRepo.save(addVersion);
+
+            if (versionAdded != null) {
+                //I quan s'ha guardat l'anterior info, editam l'actual nota amb la info nova
+                noteToUpdate.setTitle(title);
+                noteToUpdate.setBody(body);
+                noteToUpdate.setLastModification(dateTime);
+                Note updatedNote = noteRepo.save(noteToUpdate);
+                if (updatedNote != null) return true;
+            }
         }
 
-        SharedNote sharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid);
-        if (sharedNote != null) {
-        }
         return false;
     }
 
@@ -349,10 +360,10 @@ public class NoteServiceImpl implements NoteService {
 
         System.out.println("Los permisos que quiere...");
         System.out.println(permissionMode + " =? " + PermissionMode.READMODE.toString());
-        if(permissionMode.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
+        if (permissionMode.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
             permissionModeEnum = PermissionMode.READMODE;
         }
-        if(permissionMode.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
+        if (permissionMode.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
             permissionModeEnum = PermissionMode.WRITEMODE;
         }
 
@@ -497,28 +508,26 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public boolean updatePermissionMode(long userid, long shareduserid, long noteid, String newPermission) {
         PermissionMode permissionMode = null;
-        if(newPermission.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
+        if (newPermission.equalsIgnoreCase(PermissionMode.READMODE.toString())) {
             permissionMode = PermissionMode.READMODE;
         }
-        if(newPermission.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
+        if (newPermission.equalsIgnoreCase(PermissionMode.WRITEMODE.toString())) {
             permissionMode = PermissionMode.WRITEMODE;
         }
 
         if (permissionMode == null) return false;
 
         SharedNote shareNoteToUpdate = sharedNoteRepo.findByUser_UseridAndNote_Noteid(shareduserid, noteid);
-        if (isNoteOwner(userid, noteid) && shareNoteToUpdate != null) {
-            shareNoteToUpdate.setPermissionMode(permissionMode);
-            SharedNote updateSharedNote = sharedNoteRepo.save(shareNoteToUpdate);
-            if (updateSharedNote != null) return true;
-        }
+        shareNoteToUpdate.setPermissionMode(permissionMode);
+        SharedNote updateSharedNote = sharedNoteRepo.save(shareNoteToUpdate);
+        if (updateSharedNote != null) return true;
 
         return false;
     }
 
     private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<SharedNote> sharedNotes, long userid) throws Exception {
         List<RenderableNote> result = new ArrayList<>();
-        for (Note note: allNotes) {
+        for (Note note : allNotes) {
             List<User> sharedUsersFromNote = null;
             for (SharedNote sh : sharedNotes) {
                 if (sh.getNote().getNoteid().equals(note.getNoteid())) {

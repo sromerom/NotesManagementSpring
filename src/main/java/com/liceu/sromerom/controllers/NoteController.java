@@ -1,7 +1,9 @@
 package com.liceu.sromerom.controllers;
 
+import com.liceu.sromerom.entities.Version;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
+import com.liceu.sromerom.services.VersionService;
 import com.liceu.sromerom.utils.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,9 @@ public class NoteController {
 
     @Autowired
     NoteService noteService;
+
+    @Autowired
+    VersionService versionService;
 
     @GetMapping("/home")
     public String home(@RequestParam(required = false) Integer currentPage,
@@ -58,16 +63,24 @@ public class NoteController {
     }
 
     @GetMapping("/detail")
-    public String detail(@RequestParam("id") Long noteid, HttpServletRequest request, Model model) {
+    public String detail(@RequestParam("id") Long noteid, @RequestParam(required = false) Long version, HttpServletRequest request, Model model) {
         if (noteid != null) {
             HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
+            model.addAttribute("actualNote", noteService.getNoteById(noteid));
+            model.addAttribute("versionUrl", version);
+            model.addAttribute("versions", versionService.getVersionsFromNote(noteid));
 
             //Pasarem els atributs a la vista sempre i quan la nota sigui compartida amb tu
             if (noteService.isSharedNote(userid, noteid) || noteService.isNoteOwner(userid, noteid)) {
-                model.addAttribute("titleNote", noteService);
-                model.addAttribute("titleNote", noteService.getNoteById(noteid).getTitle());
-                model.addAttribute("bodyNote", noteService.getNoteById(noteid).getBody());
+
+                if (version == null) {
+                    model.addAttribute("render", "note");
+                    model.addAttribute("view", noteService.getNoteById(noteid));
+                } else {
+                    model.addAttribute("render", "version");
+                    model.addAttribute("view", versionService.getVersionById(version));
+                }
             } else {
                 //HACER REDIRECT A RESTRICTED AREA...
                 return "redirect:/restrictedArea";

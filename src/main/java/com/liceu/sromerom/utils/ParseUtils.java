@@ -7,8 +7,13 @@ import org.commonmark.renderer.text.TextContentRenderer;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class ParseUtils {
     public static String escapeText(String body) {
@@ -34,5 +39,14 @@ public class ParseUtils {
     public static String parseDefaultDateTime(LocalDateTime ldt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return ldt.format(formatter);
+    }
+
+    public static Long getDifferenceDays(LocalDateTime ldt1) {
+        LocalDateTime ldt2 = LocalDateTime.now();
+
+
+        long daysBetween = Duration.between(ldt1, ldt2).toDays();
+        System.out.println ("Days: " + daysBetween);
+        return daysBetween;
     }
 }

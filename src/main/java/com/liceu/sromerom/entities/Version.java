@@ -66,6 +66,14 @@ public class Version {
         this.note = note;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Version{" +
@@ -73,7 +81,8 @@ public class Version {
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
                 ", creationDate=" + creationDate +
-                ", note=" + note.getUser().getUsername() +
+                ", note=" + note.getTitle() +
+                ", user=" + user.getUsername() +
                 '}';
     }
 }

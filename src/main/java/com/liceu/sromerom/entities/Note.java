@@ -31,7 +31,8 @@ public class Note {
 
 
     //1-n version
-    @OneToMany(mappedBy = "note")
+    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 
     public Long getNoteid() {

@@ -40,6 +40,7 @@ public class User {
 
     //1-n version
     @OneToMany(mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 
     public Long getUserid() {
