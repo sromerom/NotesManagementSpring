@@ -288,8 +288,8 @@ public class UserServiceImpl implements UserService {
     public boolean deleteUser(long userid) {
         User userToDelete = userRepo.findById(userid).get();
         if (userToDelete != null) {
-            System.out.println("ELIMINAMOS USUARIO!!");
             userRepo.delete(userToDelete);
+            if (userRepo.existsById(userToDelete.getUserid())) return false;
             return true;
         }
 

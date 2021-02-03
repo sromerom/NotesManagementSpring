@@ -92,7 +92,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<RenderableNote> filter(long userid, String optionSelect, String search, String initDate, String endDate, int page) {
         if (optionSelect == null) optionSelect = "";
-        if (search == null) search = "";
+        if (search == null || search == "") search = ".*";
         if (initDate == null) initDate = "";
         if (endDate == null) endDate = "";
 
@@ -301,8 +301,9 @@ public class NoteServiceImpl implements NoteService {
                 deleteShareNote(userid, n.getNoteid(), usernamesToDeleteShare);
             }
             noteRepo.delete(n);
+            if (noteRepo.findById(n.getNoteid()).isPresent()) return false;
         }
-        return false;
+        return true;
     }
 
 
@@ -473,6 +474,7 @@ public class NoteServiceImpl implements NoteService {
         //Si la nota esta compartida amb tu i nomes amb tu, si podem pasar a borrar la nota
         if (canDelete) {
             sharedNoteRepo.deleteSharedNotesByNote_Noteid(noteid);
+            if (sharedNoteRepo.existsByNote_Noteid(noteid)) return false;
             return true;
         }
 
@@ -486,6 +488,7 @@ public class NoteServiceImpl implements NoteService {
         //Si la nota la he compartit jo i nomes jo, podem posar a borrar la nota
         if (canDelete) {
             sharedNoteRepo.deleteSharedNotesByNote_Noteid(noteid);
+            if (sharedNoteRepo.existsByNote_Noteid(noteid)) return false;
             return true;
         }
         return false;

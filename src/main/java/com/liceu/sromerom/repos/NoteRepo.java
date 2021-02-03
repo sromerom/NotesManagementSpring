@@ -15,7 +15,7 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
 
     //@Query("from note n inner join n.user u where n.user.userid = :userid and (n.title like %:search% or note.body like %:body%) and n.creationDate BETWEEN :startDate and :endDate")
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate AND NOT note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE NOT sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate AND NOT note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE NOT sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
             nativeQuery = true)
     List<Note> filterCreatedNotes(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
@@ -36,39 +36,39 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
 
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
             nativeQuery = true)
     List<Note> filterNotesByAll(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     //Filters title, creation date, last update
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.title DESC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.title DESC",
             nativeQuery = true)
     List<Note> filterOrderByTitleDESC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.title ASC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.title ASC",
             nativeQuery = true)
     List<Note> filterOrderByTitleASC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.creationDate DESC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.creationDate DESC",
             nativeQuery = true)
     List<Note> filterOrderByCreationDateDESC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.creationDate ASC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.creationDate ASC",
             nativeQuery = true)
     List<Note> filterOrderByCreationDateASC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.lastModification DESC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.lastModification DESC",
             nativeQuery = true)
     List<Note> filterOrderByLastModificationDESC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.lastModification ASC",
+            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.lastModification ASC",
             nativeQuery = true)
     List<Note> filterOrderByLastModificationASC(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 }

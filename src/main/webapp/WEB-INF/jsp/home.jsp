@@ -45,7 +45,7 @@
 <%-- ####################  Search Filter #################### --%>
 <div class="container">
     <div class="justify-content-center">
-        <div class="">
+        <div>
             <form class="form-inline" action="${pageContext.request.contextPath}/home" method="GET">
                 <div class="form-group mb-3 mt-3 mr-1">
                     <select class="form-control" name="typeNote" id="selectTypeNote">

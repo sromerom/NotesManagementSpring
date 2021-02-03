@@ -24,7 +24,7 @@ public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> 
 
 
     @Query(
-            value = "SELECT DISTINCT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON note.user_id = user.userid WHERE note.user_id = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate ORDER BY note.noteid DESC",
+            value = "SELECT DISTINCT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON note.user_id = user.userid WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate ORDER BY note.noteid DESC",
             nativeQuery = true)
     List<SharedNote> filterSharedNotes(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
@@ -35,7 +35,7 @@ public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> 
     List<SharedNote> findByUser_Userid(long userid, Pageable pageable);
 
     @Query(
-            value = "SELECT DISTINCT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON note.user_id = user.userid WHERE sharedNote.user_userid = :userid AND (note.title LIKE %:search% OR note.body LIKE %:search%) AND creationDate BETWEEN :initDate AND :endDate ORDER BY note.noteid DESC",
+            value = "SELECT DISTINCT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON note.user_id = user.userid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search)AND creationDate BETWEEN :initDate AND :endDate ORDER BY note.noteid DESC",
             nativeQuery = true)
     List<SharedNote> filterSharedNotesWithMe(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
