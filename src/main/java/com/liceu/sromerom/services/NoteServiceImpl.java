@@ -62,9 +62,14 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<RenderableNote> getCreatedNotes(long userid, int page) {
-        Pageable topTen = PageRequest.of(page, LIMIT);
+        Pageable limitPage;
+        if (page == -1) {
+            limitPage = all;
+        } else {
+            limitPage = PageRequest.of(page, LIMIT);
+        }
         List<RenderableNote> renderableNotes = new ArrayList<>();
-        List<Note> createdNotes = noteRepo.findByUser_Userid(userid, topTen);
+        List<Note> createdNotes = noteRepo.findByUser_Userid(userid, limitPage);
 
         if (createdNotes != null) {
             createdNotes.forEach(n -> renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), null, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification(), false)));

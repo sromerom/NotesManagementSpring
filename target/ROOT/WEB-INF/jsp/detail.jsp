@@ -13,6 +13,19 @@
 <body>
 
 <main>
+    <header>
+        <nav id="header" class="p5 navbar navbar-expand-lg">
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/home"><i class="fas fa-arrow-left"></i></a>
+                    </li>
+                </ul>
+                <span class="navbar-text"
+                      style="padding-right: .5rem; padding-left: .5rem;">Owner ${actualNote.user.username}</span>
+            </div>
+        </nav>
+    </header>
     <section id="containerView">
         <div id="renderNote">
             <h1><c:out value="${view.title}"/></h1>
@@ -43,18 +56,21 @@
                                 <div class="list-group">
                                     <c:choose>
                                     <c:when test="${empty versionUrl}">
-                                    <a href="/detail?id=${actualNote.noteid}" class="list-group-item list-group-item-action active"
+                                    <a href="/detail?id=${actualNote.noteid}"
+                                       class="list-group-item list-group-item-action active"
                                        aria-current="true">
                                         </c:when>
                                         <c:otherwise>
-                                        <a href="/detail?id=${actualNote.noteid}" class="list-group-item list-group-item-action"
+                                        <a href="/detail?id=${actualNote.noteid}"
+                                           class="list-group-item list-group-item-action"
                                            aria-current="true">
                                             </c:otherwise>
                                             </c:choose>
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h5 class="mb-1">${util.parseDefaultDateTime(actualNote.lastModification)}</h5>
 
-                                                <small>${util.getDifferenceDays(actualNote.creationDate)} days ago</small>
+                                                <small>${util.getDifferenceDays(actualNote.lastModification)} days
+                                                    ago</small>
                                             </div>
                                             <small>Current version</small>
                                             <p class="mb-1">${view.user.username}</p>
@@ -73,9 +89,16 @@
                                                 </c:choose>
                                                 <div class="d-flex w-100 justify-content-between">
                                                     <h5 class="mb-1">${util.parseDefaultDateTime(version.creationDate)}</h5>
-                                                    <small>${util.getDifferenceDays(version.creationDate)} days ago</small>
+                                                    <small>${util.getDifferenceDays(version.creationDate)} days
+                                                        ago</small>
                                                 </div>
                                                 <p class="mb-1">${version.user.username}</p>
+                                                <form method="POST" action="${pageContext.request.contextPath}/detail">
+                                                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                                                    <input type="hidden" name="versionid" value="${version.versionid}">
+                                                    <button class="button-transparent" type="submit">Make a copy
+                                                    </button>
+                                                </form>
                                             </a>
                                             </c:forEach>
                                 </div>

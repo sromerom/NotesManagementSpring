@@ -22,7 +22,7 @@
             </c:if>
             <!-- Form -->
             <form method="POST" action="${pageContext.request.contextPath}/login">
-                <h1>Management Notes Login</h1>
+                <h1>Login</h1>
                 <!-- Input fields -->
                 <div class="form-group mt-2">
                     <label for="username" class="col-sm-2 col-form-label">Username</label>
@@ -34,13 +34,30 @@
                            aria-describedby="passwordHelpBlock" name="password" required>
                 </div>
                 <input type="hidden" name="_csrftoken" value="${csrfToken}">
-                <button type="submit" class="btn btn-primary btn-customized w-100">Login</button>
+                <!-- sign in button -->
+                <button class="signinbtn">
+                   Log in
+                </button>
                 <!-- End input fields -->
             </form>
-            <p style="display: block; text-align: center">Or login with</p>
+            <div class="separator">
+                <p>OR</p>
+            </div>
+            <!--
             <button id="loginGoogle" class="google__btn">
                 <i class="fab fa-google"></i>
                 Sign in with Google
+            </button>
+            -->
+            <!-- google button -->
+            <button id="loginGoogle" class="google__btn">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+            </button>
+            <!-- twitter button -->
+            <button id="loginTwitter" class="github__btn">
+                <i class="fab fa-twitter"></i>
+                Sign in with Twitter
             </button>
             <!-- Form end -->
             <p><a href="${pageContext.request.contextPath}/register">Create your account</a></p>
@@ -51,6 +68,10 @@
 <script>
     document.querySelector("#loginGoogle").addEventListener("click", () => {
         window.location.replace("/loginGoogle");
+    })
+
+    document.querySelector("#loginTwitter").addEventListener("click", () => {
+        window.location.replace("/loginTwitter");
     })
 </script>
 </body>

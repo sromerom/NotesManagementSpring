@@ -89,10 +89,14 @@
                 </c:choose>
 
                 <input id="noteidInput" type="hidden" name="noteid" value="${noteid}">
-                <select class="js-example-basic-multiple" name="users[]" multiple="multiple">
-                    <c:forEach var="user" items="${users}">
-                        <option value="${user.username}">${user.username}</option>
-                    </c:forEach>
+                    <select class="js-example-basic-multiple" name="users[]" multiple="multiple">
+                    <c:if test="${action == '/deleteShare'}">
+                        <c:forEach var="user" items="${users}">
+                            <option value="${user.username}">${user.username}</option>
+                        </c:forEach>
+                    </c:if>
+                    <!--
+                    -->
                 </select>
 
                 <c:if test="${(action == '/share')}">
@@ -166,9 +170,16 @@
 <input id="username" type="hidden" name="username" value="${username}">
 <script>
     $(document).ready(function () {
-        $('.js-example-basic-multiple').select2();
+        $(".js-example-basic-multiple").select2({
+            tags: true,
+            tokenSeparators: [',', ' '],
+            language: {
+                "noResults": function () {
+                    return 'Entry manually users to create the shared note';
+                }
+            }
+        })
     });
-
     if (document.querySelector("#formActionDelete")) {
         document.querySelector("#formActionDelete").addEventListener("submit", function (e) {
             e.preventDefault();

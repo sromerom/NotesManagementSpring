@@ -27,7 +27,10 @@ com\liceu\sromerom\controllers\ShareController.class
 com\liceu\sromerom\repos\UserRepo.class
 com\liceu\sromerom\config\AppConfig.class
 com\liceu\sromerom\utils\PermissionMode.class
+com\liceu\sromerom\utils\HmacSha1Signature.class
 com\liceu\sromerom\interceptors\CheckCsrfTokenFilter.class
+com\liceu\sromerom\services\TwitterService.class
+com\liceu\sromerom\services\TwitterServiceImpl.class
 com\liceu\sromerom\config\AnnotationWebAppInitializer.class
 com\liceu\sromerom\entities\SharedNote.class
 com\liceu\sromerom\services\NoteService.class

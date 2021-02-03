@@ -1,3 +1,11 @@
+body {
+    background-color: whitesmoke;
+}
+
+#header {
+    height: 75px !important;
+}
+
 #containerView {
     display: flex;
     flex-wrap: nowrap;
@@ -5,6 +13,7 @@
     justify-content: space-around;
     align-items: flex-start;
     align-content: flex-start;
+    background-color: whitesmoke;
 }
 
 #renderNote {
@@ -13,11 +22,33 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    max-width: 800px;
+    margin: auto;
+    background-color: white;
+    padding-left: 40px;
+}
+#renderNote > h1 {
+    font-size: 3.5em;
+}
+div#renderNote hr {}
+
+#renderNote h1, #renderNote p, #renderNote hr{
+    max-width: 800px;
+    word-wrap: break-word;
 }
 
 #infoVersion {
     flex-basis: 20%;
 }
 
+.button-transparent {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    width: 100%;
+    height: 100%;
+}

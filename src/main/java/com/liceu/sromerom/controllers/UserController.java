@@ -3,6 +3,7 @@ package com.liceu.sromerom.controllers;
 import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.services.GoogleService;
 import com.liceu.sromerom.services.NoteService;
+import com.liceu.sromerom.services.TwitterService;
 import com.liceu.sromerom.services.UserService;
 import com.liceu.sromerom.utils.TypeUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class UserController {
 
     @Autowired
     GoogleService googleService;
+
+    @Autowired
+    TwitterService twitterService;
 
     @GetMapping("/login")
     public String getLogin() {
@@ -175,6 +179,52 @@ public class UserController {
     public String loginGoogle() throws Exception {
         URL url = googleService.getGoogleRedirectURL();
         return "redirect:" + url;
+    }
+
+    @GetMapping("/loginTwitter")
+    public String loginTwitter() throws Exception {
+        Map<String, String> requestToken = twitterService.getRequestToken();
+        System.out.println("Result: " + requestToken);
+        URL url = twitterService.getUrlRedirectTwitter(requestToken.get("oauth_token"));
+        return "redirect: "+ url;
+    }
+
+    //http://127.0.0.1:8080/auth/twitter/oauth2callback/
+    @GetMapping("/auth/twitter/oauth2callback/")
+    public String twitterAuthCallback(@RequestParam String oauth_token, @RequestParam String oauth_verifier, HttpServletRequest request) throws Exception {
+        Map<String, String> accessTokenUser = twitterService.getAccessToken(oauth_token, oauth_verifier);
+        System.out.println("oauth_token: " + accessTokenUser.get("oauth_token"));
+        System.out.println("oauth_secret_token: " + accessTokenUser.get("oauth_token_secret"));
+        Map<String, Object> verify_credentials = twitterService.getAccountDetails(accessTokenUser.get("oauth_token"), accessTokenUser.get("oauth_token_secret"));
+        String emailTwitterAccount = (String) verify_credentials.get("email");
+
+
+        if (emailTwitterAccount != null) {
+            User userIsRegistred = userService.getUserByEmailAndTypeUser(emailTwitterAccount, TypeUser.TWITTER);
+            boolean noError = false;
+
+            if (userIsRegistred != null && !userIsRegistred.getTypeUser().equals(TypeUser.NATIVE)) {
+                System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
+                //Ya esta registrado, lo llevamos al home
+                noError = true;
+            }
+
+            if (userIsRegistred == null) {
+                String usernameGenerated = userService.createNewUsernameFromEmail(emailTwitterAccount);
+                System.out.println("Es un usuario nuevo y por eso le creamos este usuario provisional: " + usernameGenerated);
+                noError = userService.createUser(emailTwitterAccount, usernameGenerated, null, TypeUser.TWITTER);
+            }
+
+            if (noError) {
+                userIsRegistred = userService.getUserByEmailAndTypeUser(emailTwitterAccount, TypeUser.TWITTER);
+                request.getSession().setAttribute("userid", userIsRegistred.getUserid());
+                return "redirect:/home";
+            }
+        } else {
+            return "redirect:/emailNotFound";
+        }
+
+        return "redirect:/login";
     }
 
 

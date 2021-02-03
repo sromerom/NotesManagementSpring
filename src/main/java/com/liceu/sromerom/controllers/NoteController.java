@@ -92,6 +92,22 @@ public class NoteController {
         return "detail";
     }
 
+    @PostMapping("/detail")
+    public String postDetail(@RequestParam Long versionid, HttpServletRequest request, Model model) {
+        Long userid = (Long) request.getSession().getAttribute("userid");
+        String titleVersion = "Copy of " + versionService.getVersionById(versionid).getTitle();
+        String bodyVersion = versionService.getVersionById(versionid).getBody();
+        boolean noError = noteService.addNote(userid, titleVersion, bodyVersion);
+
+        if (noError) {
+            //HACER REDIRECT HACIA HOME...
+            return "redirect:/detail?id=" + noteService.getCreatedNotes(userid, -1).get((int) (noteService.getCreatedNotesLength(userid) - 1)).getNoteid();
+        }
+
+        model.addAttribute("noerror", false);
+        return "detail";
+    }
+
     @GetMapping("/create")
     public String getCreate(Model model) {
         model.addAttribute("action", "/create");
