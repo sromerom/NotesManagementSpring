@@ -1,6 +1,5 @@
 package com.liceu.sromerom.controllers;
 
-import com.liceu.sromerom.entities.Version;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
 import com.liceu.sromerom.services.VersionService;
@@ -52,7 +51,7 @@ public class NoteController {
         String filterURL = Filter.getURLFilter(typeNote, titleFilter, noteStart, noteEnd);
         model.addAttribute("filterURL", filterURL);
 
-        model.addAttribute("notes", noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, (currentPage - 1)));
+        model.addAttribute("notes", noteService.filter(userid, typeNote,titleFilter, noteStart, noteEnd, (currentPage - 1)));
         totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, -1).size() / (PAGES_FOR_NOTE));
 
         //Pasam a la vista tots els parametres corresponents amb la paginacio
@@ -206,5 +205,4 @@ public class NoteController {
         }
         return "redirect:/home";
     }
-
 }

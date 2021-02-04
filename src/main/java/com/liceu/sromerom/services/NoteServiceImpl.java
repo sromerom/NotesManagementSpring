@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public class NoteServiceImpl implements NoteService {
 
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    final static short LIMIT = 10;
     Pageable all = PageRequest.of(0, Integer.SIZE);
+    final static short LIMIT = 10;
     @Autowired
     NoteRepo noteRepo;
 
@@ -144,6 +144,10 @@ public class NoteServiceImpl implements NoteService {
                     System.out.println("Filtramos en notas creadas!!");
                     notes = noteRepo.filterCreatedNotes(userid, search, initDate, endDate, limitPage);
                     break;
+                case "searchInVersion":
+                    System.out.println("Filtramos entre versiones");
+                    notes = noteRepo.filterNotesByVersion(userid, search, initDate, endDate, limitPage);
+                    break;
                 case "titleDESC":
                     System.out.println("Filtramos por titulo descendente");
                     notes = noteRepo.filterOrderByTitleDESC(userid, search, initDate, endDate, limitPage);
@@ -180,7 +184,6 @@ public class NoteServiceImpl implements NoteService {
                     .stream().map(a -> a.getNote())
                     .distinct()
                     .collect(Collectors.toList());
-
              */
 
             List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, all);
@@ -189,7 +192,6 @@ public class NoteServiceImpl implements NoteService {
             List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
                     .stream().map(a -> a.getNote())
                     .collect(Collectors.toList());
-
              */
             List<RenderableNote> renderableNotes = parseNoteToRenderable(notes, sharedNotes, userid);
             return renderableNotes;

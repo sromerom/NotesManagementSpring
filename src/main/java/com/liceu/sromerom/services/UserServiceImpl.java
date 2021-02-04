@@ -82,6 +82,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
+
+    @Override
     public User getUserByEmailAndTypeUser(String email, TypeUser typeUser) {
         return userRepo.findByEmailAndTypeUser(email, typeUser);
     }
@@ -199,7 +204,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             User validateUsername = userRepo.findUserByUsername(username);
-            User validateEmail = userRepo.findByEmailAndTypeUser(email, TypeUser.NATIVE);
+            User validateEmail = userRepo.findByEmail(email);
             //Si compleix tots els requisits que s'ha de seguir per fer un registre, retornarem true
             if (password.equals(password2) && validateUsername == null && validateEmail == null && passwordMatch && emailMatch && usernameMatch) {
                 return true;
@@ -216,7 +221,7 @@ public class UserServiceImpl implements UserService {
         try {
 
             User user = userRepo.findById(userid).get();
-            User validateEmail = userRepo.findByEmailAndTypeUser(email, TypeUser.NATIVE);
+            User validateEmail = userRepo.findByEmail(email);
             User validateUsername = userRepo.findUserByUsername(username);
             if (email != null && user != null) {
                 //Si el email introduit no es igual al seu i ja existeix, retornam false ja que no podem tenir email iguals
@@ -284,9 +289,11 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Transactional
     @Override
     public boolean deleteUser(long userid) {
         User userToDelete = userRepo.findById(userid).get();
+        System.out.println("Usuario a eliminar: " + userToDelete);
         if (userToDelete != null) {
             userRepo.delete(userToDelete);
             if (userRepo.existsById(userToDelete.getUserid())) return false;

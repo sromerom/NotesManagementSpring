@@ -27,6 +27,18 @@
         </nav>
     </header>
     <section id="containerView">
+        <div id="searchVersion">
+            <form>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Search a version"
+                           aria-label="Search a version" aria-describedby="button-addon2" name="search" value="">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+                </div>
+            </form>
+
+
+        </div>
+
         <div id="renderNote">
             <h1><c:out value="${view.title}"/></h1>
             <p>${util.renderToHTML(view.body)}</p>

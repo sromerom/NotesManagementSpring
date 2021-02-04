@@ -200,10 +200,10 @@ public class UserController {
 
 
         if (emailTwitterAccount != null) {
-            User userIsRegistred = userService.getUserByEmailAndTypeUser(emailTwitterAccount, TypeUser.TWITTER);
+            User userIsRegistred = userService.getUserByEmail(emailTwitterAccount);
             boolean noError = false;
 
-            if (userIsRegistred != null && !userIsRegistred.getTypeUser().equals(TypeUser.NATIVE)) {
+            if (userIsRegistred != null) {
                 System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
                 //Ya esta registrado, lo llevamos al home
                 noError = true;
@@ -216,7 +216,7 @@ public class UserController {
             }
 
             if (noError) {
-                userIsRegistred = userService.getUserByEmailAndTypeUser(emailTwitterAccount, TypeUser.TWITTER);
+                userIsRegistred = userService.getUserByEmail(emailTwitterAccount);
                 request.getSession().setAttribute("userid", userIsRegistred.getUserid());
                 return "redirect:/home";
             }
@@ -233,11 +233,11 @@ public class UserController {
         String accessToken = googleService.getAccessToken(code);
         Map<String, String> userDetails = googleService.getUserDetails(accessToken);
         String emailGoogleAccount = userDetails.get("email");
-        User userIsRegistred = userService.getUserByEmailAndTypeUser(emailGoogleAccount, TypeUser.GOOGLE);
+        User userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
         boolean noError = false;
 
 
-        if (userIsRegistred != null && !userIsRegistred.getTypeUser().equals(TypeUser.NATIVE)) {
+        if (userIsRegistred != null) {
             System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
             //Ya esta registrado, lo llevamos al home
             noError = true;
@@ -257,7 +257,7 @@ public class UserController {
         }
 
         if (noError) {
-            userIsRegistred = userService.getUserByEmailAndTypeUser(emailGoogleAccount, TypeUser.GOOGLE);
+            userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
             session.setAttribute("userid", userIsRegistred.getUserid());
             return "redirect:/home";
         } else {

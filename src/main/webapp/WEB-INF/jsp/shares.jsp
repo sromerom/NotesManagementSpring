@@ -88,23 +88,22 @@
                 </c:otherwise>
                 </c:choose>
 
-                <input id="noteidInput" type="hidden" name="noteid" value="${noteid}">
-                    <select class="js-example-basic-multiple" name="users[]" multiple="multiple">
-                    <c:if test="${action == '/deleteShare'}">
-                        <c:forEach var="user" items="${users}">
-                            <option value="${user.username}">${user.username}</option>
-                        </c:forEach>
-                    </c:if>
-                    <!--
-                    -->
-                </select>
 
-                <c:if test="${(action == '/share')}">
-                    <select name="permissionMode" id="permissionMode">
-                        <option value="READMODE">Read Mode</option>
-                        <option value="WRITEMODE">Write Mode</option>
-                    </select>
-                </c:if>
+                <input id="noteidInput" type="hidden" name="noteid" value="${noteid}">
+
+                    <c:choose>
+                        <c:when test="${action == '/share'}">
+                    <select class="addshare" name="users[]" multiple="multiple">
+                        </c:when>
+                        <c:otherwise>
+                            <select class="deleteShare" name="users[]" multiple="multiple">
+                        </c:otherwise>
+                    </c:choose>
+
+                    <c:forEach var="user" items="${users}">
+                        <option value="${user.username}">${user.username}</option>
+                    </c:forEach>
+                </select>
                 <small id="shareHelpBlock" class="form-text text-muted">
                     Remember that you cannot delete or create the share of a user that already exists.
                 </small>
@@ -170,21 +169,24 @@
 <input id="username" type="hidden" name="username" value="${username}">
 <script>
     $(document).ready(function () {
-        $(".js-example-basic-multiple").select2({
-            tags: true,
-            tokenSeparators: [',', ' '],
-            language: {
-                "noResults": function () {
-                    return 'Entry manually users to create the shared note';
-                }
-            }
-        })
+        if (document.querySelector(".addshare")) {
+            $(".addshare").select2({
+                minimumInputLength: 3,
+                minimumResultsForSearch: 10
+            })
+        }
+
+        if (document.querySelector(".deleteShare")) {
+            $(".deleteShare").select2({
+                minimumResultsForSearch: 10
+            })
+        }
     });
     if (document.querySelector("#formActionDelete")) {
         document.querySelector("#formActionDelete").addEventListener("submit", function (e) {
             e.preventDefault();
             const username = document.querySelector("#username").value;
-            const selected = $('.js-example-basic-multiple').select2("val");
+            const selected = $('.deleteShare').select2("val");
             let check = false;
             selected.forEach(u => {
                 if (u === username) {

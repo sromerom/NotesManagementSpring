@@ -7,14 +7,19 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import java.util.Set;
 
+
+/*
 @Table(name = "user",
         uniqueConstraints = { @UniqueConstraint( columnNames = { "email", "type_user" } ) } )
+
+ */
 @Entity(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
 
+    @Column(unique = true)
     private String email;
 
     @Column(unique = true)
@@ -27,19 +32,18 @@ public class User {
     private TypeUser typeUser;
 
     //RELACIO 1-N amb notes
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
     //RELACIO N-N amb notes
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
 
 
     //1-n version
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 

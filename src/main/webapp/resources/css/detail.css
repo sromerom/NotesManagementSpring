@@ -14,6 +14,7 @@ body {
     align-items: flex-start;
     align-content: flex-start;
     background-color: whitesmoke;
+    height: 100vh;
 }
 
 #renderNote {
@@ -24,9 +25,10 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     max-width: 800px;
-    margin: auto;
     background-color: white;
     padding-left: 40px;
+    margin-top: 0x;
+    margin: 0px auto auto auto;
 }
 #renderNote > h1 {
     font-size: 3.5em;
