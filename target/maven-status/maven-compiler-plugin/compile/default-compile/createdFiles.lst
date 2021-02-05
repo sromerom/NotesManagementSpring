@@ -1,2 +1,2 @@
-com/liceu/sromerom/exceptions/GlobalExceptionHandler.class
-com/liceu/sromerom/exceptions/CustomGenericException.class
+com\liceu\sromerom\exceptions\CustomGenericException.class
+com\liceu\sromerom\exceptions\GlobalExceptionHandler.class

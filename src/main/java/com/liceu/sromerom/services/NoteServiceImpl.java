@@ -291,21 +291,17 @@ public class NoteServiceImpl implements NoteService {
             notesToDelete.add(noteToDelete);
         }
 
-        for (Note n : notesToDelete) {
-            if (sharedNoteRepo.existsSharedNoteByNote_Noteid(n.getNoteid())) {
-                List<String> listUsernames = new ArrayList<>();
-                userRepo.getUsersFromSharedNote(n.getNoteid())
-                        .stream()
-                        .map(ne -> listUsernames.add(ne.getUsername()))
-                        .collect(Collectors.toList());
-                String[] usernamesToDeleteShare = new String[listUsernames.size()];
-                listUsernames.toArray(usernamesToDeleteShare);
-                deleteShareNote(userid, n.getNoteid(), usernamesToDeleteShare);
+        if (notesToDelete.size() != 0) {
+            for (Note n : notesToDelete) {
+                User user = userRepo.findById(userid).get();
+                noteRepo.deleteById(n.getNoteid());
+                if (noteRepo.existsNoteByNoteidAndUser_Userid(n.getNoteid(), user.getUserid())) return false;
             }
-            noteRepo.delete(n);
-            if (noteRepo.findById(n.getNoteid()).isPresent()) return false;
+
+            return true;
         }
-        return true;
+
+        return false;
     }
 
 
@@ -422,31 +418,31 @@ public class NoteServiceImpl implements NoteService {
         List<User> usersToDeleteShare = new ArrayList<>();
 
         if (noteForDeleteShare != null) {
+            System.out.println("Entras aqui?????????????????????????????");
             for (String username : usernames) {
                 long userid = userRepo.findUserByUsername(username).getUserid();
                 //Per guardar l'usuari al que descompartirem, abans hem de comprovar si la nota que es vol descompartir ja ho esta compartida previamente amb els usuaris introduits.
                 //Si esta compartida, ho afegim a la llista
                 if (sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid) != null) {
+                    System.out.println("Añadimoooooooooooooooooooooooooooooooooooooooooooos");
                     User user = userRepo.findById(userid).get();
                     usersToDeleteShare.add(user);
                 }
             }
 
-            int notesDeleted = 0;
             if (usersToDeleteShare.size() != 0) {
                 for (User u : usersToDeleteShare) {
-                    User user = userRepo.findById(u.getUserid()).get();
-                    SharedNote deleteShareNote = new SharedNote();
-                    deleteShareNote.setNote(noteForDeleteShare);
-                    deleteShareNote.setUser(user);
-                    deleteShareNote.setId(new SharedNoteCK(user.getUserid(), noteForDeleteShare.getNoteid()));
+                    //User user = userRepo.findById(u.getUserid()).get();
+                    ////SharedNote sharedNoteToDelete = sharedNoteRepo.findByUser_UseridAndNote_Noteid(user.getUserid(), noteid);
+                    //noteForDeleteShare.getSharedNotes().remove(sharedNoteToDelete);
+                    //user.getSharedNotes().remove(sharedNoteToDelete);
+                    //sharedNoteRepo.deleteById(new SharedNoteCK(user.getUserid(), noteid));
 
-                    // Note insertedNote = noteRepo.save(newNote);
-                    sharedNoteRepo.delete(deleteShareNote);
-                    notesDeleted++;
+                    sharedNoteRepo.deleteById(new SharedNoteCK(u.getUserid(), noteid));
+                    if (sharedNoteRepo.existsSharedNoteByUser_UseridAndNote_Noteid(u.getUserid(), noteid)) return false;
                 }
 
-                if (usersToDeleteShare.size() == notesDeleted) return true;
+                return true;
             }
         }
         return false;
@@ -535,7 +531,7 @@ public class NoteServiceImpl implements NoteService {
         return false;
     }
 
-    private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<SharedNote> sharedNotes, long userid) throws Exception {
+    private List<RenderableNote> parseNoteToRenderable(List<Note> allNotes, List<SharedNote> sharedNotes, long userid) {
         List<RenderableNote> result = new ArrayList<>();
         for (Note note : allNotes) {
             List<User> sharedUsersFromNote = null;
