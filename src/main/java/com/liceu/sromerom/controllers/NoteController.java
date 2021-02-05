@@ -1,5 +1,6 @@
 package com.liceu.sromerom.controllers;
 
+import com.liceu.sromerom.exceptions.CustomGenericException;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
 import com.liceu.sromerom.services.VersionService;
@@ -26,15 +27,17 @@ public class NoteController {
     @Autowired
     VersionService versionService;
 
+    @Autowired
+    HttpSession session;
+
     @GetMapping("/home")
     public String home(@RequestParam(required = false) Integer currentPage,
                        @RequestParam(required = false) String typeNote,
                        @RequestParam(required = false) String titleFilter,
                        @RequestParam(required = false) String noteStart,
                        @RequestParam(required = false) String noteEnd,
-                       HttpServletRequest request, Model model) {
+                       Model model) {
 
-        HttpSession session = request.getSession();
         Long userid = (Long) session.getAttribute("userid");
         String username = userService.getUserById(userid).getUsername();
         model.addAttribute("useridSession", userid);
@@ -62,9 +65,8 @@ public class NoteController {
     }
 
     @GetMapping("/detail")
-    public String detail(@RequestParam("id") Long noteid, @RequestParam(required = false) Long version, HttpServletRequest request, Model model) {
+    public String detail(@RequestParam("id") Long noteid, @RequestParam(required = false) Long version, Model model) {
         if (noteid != null) {
-            HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("actualNote", noteService.getNoteById(noteid));
             model.addAttribute("versionUrl", version);
@@ -82,7 +84,7 @@ public class NoteController {
                 }
             } else {
                 //HACER REDIRECT A RESTRICTED AREA...
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
             //HACER REDIRECT A HOME..
@@ -92,8 +94,8 @@ public class NoteController {
     }
 
     @PostMapping("/detail")
-    public String postDetail(@RequestParam Long versionid, HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String postDetail(@RequestParam Long versionid, Model model) {
+        Long userid = (Long) session.getAttribute("userid");
         String titleVersion = "Copy of " + versionService.getVersionById(versionid).getTitle();
         String bodyVersion = versionService.getVersionById(versionid).getBody();
         boolean noError = noteService.addNote(userid, titleVersion, bodyVersion);
@@ -115,7 +117,6 @@ public class NoteController {
 
     @PostMapping("/create")
     public String postCreate(@RequestParam String title, @RequestParam("bodyContent") String body, Model model, HttpServletRequest request) {
-        HttpSession session = request.getSession();
 
         long userid = (long) session.getAttribute("userid");
 
@@ -138,11 +139,10 @@ public class NoteController {
     }
 
     @GetMapping("/edit")
-    public String getEdit(@RequestParam("id") Long noteid, HttpServletRequest request, Model model) {
+    public String getEdit(@RequestParam("id") Long noteid, Model model) {
         System.out.println("Noteid de la nota que vamos a actualizar: " + noteid);
 
         if (noteid != null) {
-            HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
 
             model.addAttribute("action", "/edit");
@@ -154,7 +154,7 @@ public class NoteController {
                 model.addAttribute("body", noteService.getNoteById(noteid).getBody());
             } else {
                 //HACER REDIRECT RESTRICTED AREA
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
             //HACER REDIRECT HOME
@@ -165,13 +165,12 @@ public class NoteController {
     }
 
     @PostMapping("/edit")
-    public String postEdit(@RequestParam String title, @RequestParam("bodyContent") String body, @RequestParam Long noteid, HttpServletRequest request, Model model) {
+    public String postEdit(@RequestParam String title, @RequestParam("bodyContent") String body, @RequestParam Long noteid, Model model) {
         boolean noError = false;
 
         //Si estan tots els parametres necessaris, procedirem a actualitzar la nota
         if (title != null && body != null) {
             //Actualitzam la nota...
-            HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
             noError = noteService.editNote(userid, noteid, title, body);
         }
@@ -187,10 +186,9 @@ public class NoteController {
     }
 
     @PostMapping("/delete")
-    public String postDelete(@RequestParam String[] checkboxDelete, HttpServletRequest request, Model model) {
+    public String postDelete(@RequestParam String[] checkboxDelete) {
         System.out.println(Arrays.toString(checkboxDelete));
         if (checkboxDelete != null) {
-            HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
 
             //Eliminarem notes sempre i quan tinguem un id d'usuari i tinguem notes per eliminar
@@ -200,7 +198,7 @@ public class NoteController {
                 //REDIRECT HACIA EL HOME...
             } else {
                 //REDIRECT HACIA EL RESTRICTED AREA
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         }
         return "redirect:/home";

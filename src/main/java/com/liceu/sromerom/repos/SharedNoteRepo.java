@@ -12,15 +12,10 @@ import java.util.List;
 
 public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> {
     //SharedNotes & Filter
-    //No funciona distinct
-    //List<SharedNote> findDistinctByNote_User_Userid(long userid, Pageable pageable);
-    //SELECT DISTINCT * FROM sharedNote INNER JOIN note ON sharedNote.note_id = note.note_id INNER JOIN user ON note.user_iduser = user.user_id WHERE note.user_iduser = ? ORDER BY sharedNote.shared_note DESC LIMIT ? OFFSET ?"
-    //List<SharedNote> getSharedNotesFromUser(@Param("userid") Long userid, Pageable pageable);
     @Query(
             value = "SELECT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON user.userid = sharedNote.user_userid WHERE note.user_id = :userid ORDER BY sharedNote.note_noteid DESC",
             nativeQuery = true)
     List<SharedNote> getSharedNotesByUserid(@Param("userid") Long userid, Pageable pageable);
-
 
 
     @Query(
@@ -45,9 +40,12 @@ public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> 
 
     //Exists sharedNoteAndSpecificUser?
     SharedNote findByUser_UseridAndNote_Noteid(long userid, long noteid);
+    boolean existsSharedNoteByUser_UseridAndNote_Noteid(long userid, long noteid);
+
 
     //Exists note with noteid
-    boolean existsByNote_Noteid(long noteid);
+    //boolean existsByNote_Noteid(long noteid);
+    boolean existsSharedNoteByNote_Noteid(long noteid);
 
     List<SharedNote> findByNote_Noteid(long noteid);
 

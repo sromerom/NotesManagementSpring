@@ -24,7 +24,8 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
     long countByUser_Userid(long userid);
 
     //Is owner note?
-    Note findNoteByNoteidAndUser_Userid(long noteid, long userid);
+    //Note findNoteByNoteidAndUser_Userid(long noteid, long userid);
+    boolean existsNoteByNoteidAndUser_Userid(long noteid, long userid);
 
     @Query("from user u inner join u.sharedNotes sn where sn.note.noteid = :noteid")
     List<User> getUsersFromSharedNote(@Param("noteid") Long noteid);
@@ -34,13 +35,12 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
             nativeQuery = true)
     List<Note> getAllNotesFromUser(@Param("userid") Long userid, Pageable pageable);
 
-
+    //Filter search in versions
     @Query(
             value = "SELECT note.noteid, note.body, note.creationDate, note.lastModification, note.title, note.user_id FROM note INNER JOIN version ON note.noteid = version.note_id WHERE note.user_id = :userid AND (version.title REGEXP :search OR version.body REGEXP :search) AND version.creationDate BETWEEN :initDate AND :endDate UNION SELECT note.noteid, note.body, note.creationDate, note.lastModification, note.title, note.user_id FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN version ON version.note_id = note.noteid WHERE sharedNote.user_userid = :userid AND (version.title REGEXP :search OR version.body REGEXP :search) AND version.creationDate BETWEEN :initDate AND :endDate",
             nativeQuery = true)
     List<Note> filterNotesByVersion(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
-    //Filter search in versions
     @Query(
             value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
             nativeQuery = true)

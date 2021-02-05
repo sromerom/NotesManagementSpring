@@ -3,8 +3,6 @@ package com.liceu.sromerom.services;
 import com.liceu.sromerom.entities.Version;
 import com.liceu.sromerom.repos.VersionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.liceu.sromerom.controllers;
 
 
+import com.liceu.sromerom.exceptions.CustomGenericException;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
+
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -21,11 +22,13 @@ public class ShareController {
     @Autowired
     NoteService noteService;
 
+    @Autowired
+    HttpSession session;
+
     @GetMapping("/share")
-    public String share(@RequestParam("id") Long noteid, HttpServletRequest request, Model model) {
+    public String share(@RequestParam("id") Long noteid, Model model) {
         //Si hi ha parametre en la url, procedirem a enviar el usuaris que amb els que ha compartir i carregarem el select amb tots els usuaris
         if (noteid != null) {
-            HttpSession session = request.getSession();
             Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("noteid", noteid);
@@ -38,7 +41,7 @@ public class ShareController {
                 model.addAttribute("action", "/share");
             } else {
                 //REDIRECT A RESTRICTED AREA
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
             //REDIRECT AL HOME
@@ -48,8 +51,8 @@ public class ShareController {
     }
 
     @PostMapping("/share")
-    public String postShare(@RequestParam("users[]") String[] toShare, @RequestParam(required = false) String permissionMode, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String postShare(@RequestParam("users[]") String[] toShare, @RequestParam(required = false) String permissionMode, @RequestParam("noteid") Long noteid, Model model) {
+        Long userid = (Long) session.getAttribute("userid");
         boolean noError = false;
 
         if (toShare != null && noteid != null && toShare.length > 0 && !userService.existsUserShare(noteid, userid, toShare)) {
@@ -77,9 +80,9 @@ public class ShareController {
     }
 
     @GetMapping("/deleteShare")
-    public String getDeleteShare(@RequestParam("id") Long noteid, HttpServletRequest request, Model model) {
+    public String getDeleteShare(@RequestParam("id") Long noteid, Model model) {
         if (noteid != null) {
-            Long userid = (Long) request.getSession().getAttribute("userid");
+            Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("noteid", noteid);
             model.addAttribute("users", userService.getSharedUsers(noteid));
@@ -89,7 +92,7 @@ public class ShareController {
                 model.addAttribute("action", "/deleteShare");
             } else {
                 //REDIRECT A RESTRICTED AREA
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
             //REDIRECT AL HOME
@@ -100,8 +103,8 @@ public class ShareController {
     }
 
     @PostMapping("/deleteShare")
-    public String postDeleteShare(@RequestParam("users[]") String[] toDeleteShare, @RequestParam("noteid") Long noteid, HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String postDeleteShare(@RequestParam("users[]") String[] toDeleteShare, @RequestParam("noteid") Long noteid, Model model) {
+        Long userid = (Long) session.getAttribute("userid");
         boolean noError = false;
         if (noteid != null && toDeleteShare.length > 0 && noteService.isNoteOwner(userid, noteid) || noteService.isSharedNote(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
             System.out.println("Es note owner y el ha compartido su nota!!!!!!!!!!!");
@@ -117,7 +120,7 @@ public class ShareController {
                 //REDIRECT AL HOME...
             }
         } else {
-            return "redirect:/restrictedArea";
+            throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             //REDIRECT A RESTRICTED AREA
         }
 
@@ -127,11 +130,11 @@ public class ShareController {
     }
 
     @PostMapping("/deleteAllShare")
-    public String deleteAllShare(@RequestParam Long noteid, HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String deleteAllShare(@RequestParam Long noteid) {
+        Long userid = (Long) session.getAttribute("userid");
         if (noteid != null && userid != null) {
             if (!noteService.isSharedNote(userid, noteid) && !noteService.isNoteOwner(userid, noteid)) {
-                return "redirect:/restrictedArea";
+                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
 
             boolean noerror = noteService.deleteAllShareNote(userid, noteid);
@@ -140,8 +143,8 @@ public class ShareController {
     }
 
     @PostMapping("/updatePermission")
-    public String updatePermission(@RequestParam Long noteid, @RequestParam Long shareduserid, @RequestParam String permissionMode, HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String updatePermission(@RequestParam Long noteid, @RequestParam Long shareduserid, @RequestParam String permissionMode, Model model) {
+        Long userid = (Long) session.getAttribute("userid");
         System.out.println("######################################################################");
         System.out.println(noteid);
         System.out.println(shareduserid);

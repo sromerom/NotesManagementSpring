@@ -1,6 +1,7 @@
 package com.liceu.sromerom.controllers;
 
 import com.liceu.sromerom.entities.User;
+import com.liceu.sromerom.exceptions.CustomGenericException;
 import com.liceu.sromerom.services.GoogleService;
 import com.liceu.sromerom.services.NoteService;
 import com.liceu.sromerom.services.TwitterService;
@@ -35,20 +36,22 @@ public class UserController {
     @Autowired
     TwitterService twitterService;
 
+    @Autowired
+    HttpSession session;
+
     @GetMapping("/login")
     public String getLogin() {
         return "login";
     }
 
     @PostMapping("login")
-    public String postLogin(@RequestParam("username") String username, @RequestParam("password") String pass, HttpServletRequest req, Model model) {
+    public String postLogin(@RequestParam("username") String username, @RequestParam("password") String pass, Model model) {
         //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
         User user = userService.getUserByUsername(username);
 
         //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
         if (user != null && pass != null) {
             if (user.getTypeUser().equals(TypeUser.NATIVE) && userService.validateUser(username, pass)) {
-                HttpSession session = req.getSession();
                 session.setAttribute("userid", userService.getUserByUsername(username).getUserid());
                 return "redirect:/home";
             }
@@ -60,8 +63,7 @@ public class UserController {
 
 
     @PostMapping("/unlogin")
-    public String postUnlogin(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+    public String postUnlogin() {
         session.invalidate();
 
         //HACER REDIRECT AL LOGIN
@@ -97,14 +99,14 @@ public class UserController {
 
 
     @GetMapping("/editProfile")
-    public String getEditProfile(HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+    public String getEditProfile(Model model) {
+        Long userid = (Long) session.getAttribute("userid");
         if (userid != null && userService.getUserById(userid) != null) {
             model.addAttribute("typeUser", userService.getUserById(userid).getTypeUser());
             model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("email", userService.getUserById(userid).getEmail());
         } else {
-            return "redirect:/restrictedArea";
+            throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
         }
 
         return "userProfile";
@@ -116,10 +118,9 @@ public class UserController {
                                   @RequestParam(required = false) String currentPassword,
                                   @RequestParam(required = false) String newPass,
                                   @RequestParam(required = false) String newPassConfirm,
-                                  HttpServletRequest request,
                                   Model model) {
 
-        Long userid = (Long) request.getSession().getAttribute("userid");
+        Long userid = (Long) session.getAttribute("userid");
 
         boolean noError = false;
 
@@ -154,7 +155,7 @@ public class UserController {
 
     @PostMapping("/deleteUser")
     public String deleteUser(HttpServletRequest request, Model model) {
-        Long userid = (Long) request.getSession().getAttribute("userid");
+        Long userid = (Long) session.getAttribute("userid");
 
         boolean noError = false;
         if (userid != null) {
@@ -191,7 +192,7 @@ public class UserController {
 
     //http://127.0.0.1:8080/auth/twitter/oauth2callback/
     @GetMapping("/auth/twitter/oauth2callback/")
-    public String twitterAuthCallback(@RequestParam String oauth_token, @RequestParam String oauth_verifier, HttpServletRequest request) throws Exception {
+    public String twitterAuthCallback(@RequestParam String oauth_token, @RequestParam String oauth_verifier) throws Exception {
         Map<String, String> accessTokenUser = twitterService.getAccessToken(oauth_token, oauth_verifier);
         System.out.println("oauth_token: " + accessTokenUser.get("oauth_token"));
         System.out.println("oauth_secret_token: " + accessTokenUser.get("oauth_token_secret"));
@@ -217,11 +218,11 @@ public class UserController {
 
             if (noError) {
                 userIsRegistred = userService.getUserByEmail(emailTwitterAccount);
-                request.getSession().setAttribute("userid", userIsRegistred.getUserid());
+                session.setAttribute("userid", userIsRegistred.getUserid());
                 return "redirect:/home";
             }
         } else {
-            return "redirect:/emailNotFound";
+            throw new CustomGenericException("Email Error", "Sorry. If you want entry with twitter account, you must have an email address assigned in your account.");
         }
 
         return "redirect:/login";

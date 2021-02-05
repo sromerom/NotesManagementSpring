@@ -209,15 +209,15 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public boolean isNoteOwner(long userid, long noteid) {
 
-        Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
-        if (noteOwner != null) return true;
+        boolean isOwner = noteRepo.existsNoteByNoteidAndUser_Userid(noteid, userid);
+        if (isOwner) return true;
         return false;
     }
 
     @Override
     public boolean isSharedNote(long userid, long noteid) {
-        SharedNote existsSharedNote = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, noteid);
-        if (existsSharedNote != null) return true;
+        boolean existsSharedNote = sharedNoteRepo.existsSharedNoteByUser_UseridAndNote_Noteid(userid, noteid);
+        if (existsSharedNote) return true;
         return false;
     }
 
@@ -292,7 +292,7 @@ public class NoteServiceImpl implements NoteService {
         }
 
         for (Note n : notesToDelete) {
-            if (sharedNoteRepo.existsByNote_Noteid(n.getNoteid())) {
+            if (sharedNoteRepo.existsSharedNoteByNote_Noteid(n.getNoteid())) {
                 List<String> listUsernames = new ArrayList<>();
                 userRepo.getUsersFromSharedNote(n.getNoteid())
                         .stream()
@@ -386,10 +386,10 @@ public class NoteServiceImpl implements NoteService {
                 //a la llista
 
                 //Si entre els usuaris trobam el usuari owner de la nota, no compartirem la nota
-                if (noteRepo.findNoteByNoteidAndUser_Userid(noteid, userToShare.getUserid()) != null) {
+                if (noteRepo.existsNoteByNoteidAndUser_Userid(noteid, userToShare.getUserid())) {
                     return false;
                 }
-                if (sharedNoteRepo.findByUser_UseridAndNote_Noteid(userToShare.getUserid(), noteid) == null) {
+                if (!sharedNoteRepo.existsSharedNoteByUser_UseridAndNote_Noteid(userToShare.getUserid(), noteid)) {
                     User user = userRepo.findById(userToShare.getUserid()).get();
                     usersToShare.add(user);
                 }
@@ -476,7 +476,7 @@ public class NoteServiceImpl implements NoteService {
         //Si la nota esta compartida amb tu i nomes amb tu, si podem pasar a borrar la nota
         if (canDelete) {
             sharedNoteRepo.deleteSharedNotesByNote_Noteid(noteid);
-            if (sharedNoteRepo.existsByNote_Noteid(noteid)) return false;
+            if (sharedNoteRepo.existsSharedNoteByNote_Noteid(noteid)) return false;
             return true;
         }
 
@@ -490,7 +490,7 @@ public class NoteServiceImpl implements NoteService {
         //Si la nota la he compartit jo i nomes jo, podem posar a borrar la nota
         if (canDelete) {
             sharedNoteRepo.deleteSharedNotesByNote_Noteid(noteid);
-            if (sharedNoteRepo.existsByNote_Noteid(noteid)) return false;
+            if (sharedNoteRepo.existsSharedNoteByNote_Noteid(noteid)) return false;
             return true;
         }
         return false;
@@ -550,7 +550,7 @@ public class NoteServiceImpl implements NoteService {
             boolean writeable = false;
             SharedNote sh = sharedNoteRepo.findByUser_UseridAndNote_Noteid(userid, note.getNoteid());
 
-            if (sharedNoteRepo.existsByNote_Noteid(note.getNoteid()) && sh != null) {
+            if (sharedNoteRepo.existsSharedNoteByNote_Noteid(note.getNoteid()) && sh != null) {
                 if (sh.getPermissionMode().equals(PermissionMode.WRITEMODE)) writeable = true;
             }
 

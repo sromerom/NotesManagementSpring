@@ -146,8 +146,9 @@ public class UserServiceImpl implements UserService {
         System.out.println("noteid: " + noteid);
         System.out.println("Users to delete: " + Arrays.toString(sharedUsers));
 
-        User user = userRepo.findById(userid).get();
-        Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
+        //User user = userRepo.findById(userid).get();
+        //boolean isOwner = noteRepo.existsNoteByNoteidAndUser_Userid(noteid, userid);
+        //Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
         List<User> usersShared = userRepo.getUsersFromSharedNote(noteid);
 
         //Si no es owner, voldra dir que l'usuari amb qui s'ha compartit la nota, no vol seguir amb aquell share.

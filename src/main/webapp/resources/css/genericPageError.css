@@ -1,0 +1,75 @@
+body {
+    overflow: hidden;
+}
+html,
+body {
+    position: relative;
+    background: whitesmoke;
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+}
+.Container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+.MainTitle {
+    display: block;
+    font-size: 2rem;
+    font-weight: lighter;
+    text-align: center;
+}
+.MainDescription {
+    max-width: 50%;
+    font-size: 1.2rem;
+    font-weight: lighter;
+}
+.MainGraphic {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 800px;
+    position: relative;
+}
+
+.Note {
+    flex-basis: 100%;
+    position: absolute;
+    left: 50%;
+    top: 0px;
+}
+.Cog {
+    flex-basis: 100%;
+    width: 10rem;
+    height: 10rem;
+    fill: #e01a4f;
+    transition: easeInOutQuint();
+    -webkit-animation: CogAnimation 5s infinite;
+    animation: CogAnimation 5s infinite;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+@-webkit-keyframes CogAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@keyframes CogAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
