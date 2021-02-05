@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 
@@ -116,12 +115,12 @@ public class NoteController {
     }
 
     @PostMapping("/create")
-    public String postCreate(@RequestParam String title, @RequestParam("bodyContent") String body, Model model, HttpServletRequest request) {
+    public String postCreate(@RequestParam String title, @RequestParam("bodyContent") String body, Model model) {
 
         long userid = (long) session.getAttribute("userid");
 
         boolean noError = false;
-        if (request.getParameter("title") != null && request.getParameter("bodyContent") != null) {
+        if (title != null && body != null) {
             //Cream la nota...
             noError = noteService.addNote(userid, title, body);
         }

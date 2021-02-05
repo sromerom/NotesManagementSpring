@@ -43,10 +43,10 @@
     </nav>
 </header>
 <%-- ####################  Search Filter #################### --%>
-<div class="container">
-    <div class="justify-content-center">
+<div class="container-fluid">
+    <div>
         <div>
-            <form class="form-inline" action="${pageContext.request.contextPath}/home" method="GET">
+            <form class="form-inline justify-content-center" action="${pageContext.request.contextPath}/home" method="GET">
                 <div class="form-group mb-3 mt-3 mr-1">
                     <select class="form-control" name="typeNote" id="selectTypeNote">
                         <c:choose>
@@ -396,7 +396,7 @@
                     </c:when>
                     <c:otherwise>
                         <%-- #################### Notes compartides amb tu #################### --%>
-                        <div class="card sharedNotesWithMe" style="width: 18rem; background-color: #f15946; color: white;<c:if test="${note.writeable eq true}"> border: 2px solid #f9c22e;"</c:if>">
+                        <div class="card sharedNotesWithMe" style="width: 18rem; background-color: #f15946; color: white;<c:if test="${note.writeable eq true}"> border: 10px solid #f9c22e;"</c:if>">
                             <div class="card-body">
                                 <h5 class="card-title">${note.title}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">Created By ${note.owner.username}</h6>

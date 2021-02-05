@@ -91,31 +91,37 @@
 
                 <input id="noteidInput" type="hidden" name="noteid" value="${noteid}">
 
-                    <c:choose>
-                        <c:when test="${action == '/share'}">
-                    <select class="addshare" name="users[]" multiple="multiple">
-                        </c:when>
-                        <c:otherwise>
-                            <select class="deleteShare" name="users[]" multiple="multiple">
-                        </c:otherwise>
-                    </c:choose>
-
-                    <c:forEach var="user" items="${users}">
-                        <option value="${user.username}">${user.username}</option>
-                    </c:forEach>
-                </select>
-                <small id="shareHelpBlock" class="form-text text-muted">
-                    Remember that you cannot delete or create the share of a user that already exists.
-                </small>
-                <input type="hidden" name="_csrftoken" value="${csrfToken}">
                 <c:choose>
-                    <c:when test="${action == '/deleteShare'}">
-                        <button type="submit" class="btn btn-danger">Delete specific share</button>
+                <c:when test="${action == '/share'}">
+                <select class="addshare" name="users[]" multiple="multiple">
                     </c:when>
                     <c:otherwise>
-                        <button type="submit" class="btn btn-success">Add shares</button>
+                    <select class="deleteShare" name="users[]" multiple="multiple">
+                        </c:otherwise>
+                        </c:choose>
+
+                        <c:forEach var="user" items="${users}">
+                            <option value="${user.username}">${user.username}</option>
+                        </c:forEach>
+                    </select>
+                    <c:if test="${action == '/share'}">
+                    <select name="permissionMode" id="permissionMode">
+                        <option selected="true" value="READMODE">Read Mode</option>
+                        <option value="WRITEMODE">Write Mode</option>
+                    </select>
+                    </c:if>
+                    <small id="shareHelpBlock" class="form-text text-muted">
+                        Remember that you cannot delete or create the share of a user that already exists.
+                    </small>
+                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                    <c:choose>
+                    <c:when test="${action == '/deleteShare'}">
+                    <button type="submit" class="btn btn-danger">Delete specific share</button>
+                    </c:when>
+                    <c:otherwise>
+                    <button type="submit" class="btn btn-success">Add shares</button>
                     </c:otherwise>
-                </c:choose>
+                    </c:choose>
             </form>
     </div>
 </section>

@@ -34,14 +34,14 @@ body {
     justify-content: center;
     flex-direction: column;
     flex-wrap: nowrap;
-    height: 800px;
+    height: 600px;
     position: relative;
 }
 
 .Note {
     flex-basis: 100%;
     position: absolute;
-    left: 50%;
+    left: 25%;
     top: 0px;
 }
 .Cog {
@@ -53,8 +53,7 @@ body {
     -webkit-animation: CogAnimation 5s infinite;
     animation: CogAnimation 5s infinite;
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 42%;
 }
 
 @-webkit-keyframes CogAnimation {

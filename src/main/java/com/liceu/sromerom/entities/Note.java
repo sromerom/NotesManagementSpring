@@ -3,6 +3,7 @@ package com.liceu.sromerom.entities;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,8 +18,13 @@ public class Note {
     private String title;
 
     @Type(type="text")
+    @Column(nullable = false)
     private String body;
+
+    @Column(nullable = false)
     private LocalDateTime creationDate;
+
+    @Column(nullable = false)
     private LocalDateTime lastModification;
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)

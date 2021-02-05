@@ -28,7 +28,7 @@ public class SharedNote {
 
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "permission_mode")
+    @Column(name = "permission_mode", nullable = false)
     private PermissionMode permissionMode;
 
 

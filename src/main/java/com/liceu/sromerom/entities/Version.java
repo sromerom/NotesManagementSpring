@@ -15,7 +15,10 @@ public class Version {
     private String title;
 
     @Type(type="text")
+    @Column(nullable = false)
     private String body;
+
+    @Column(nullable = false)
     private LocalDateTime creationDate;
 
     @ManyToOne
