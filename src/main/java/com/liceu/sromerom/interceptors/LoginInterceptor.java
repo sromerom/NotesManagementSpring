@@ -16,7 +16,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     HttpSession session;
 
 
-    private static final String[] loginRequiredURLs = new String[]{"/home", "/unlogin", "/create", "/edit", "/delete", "/deleteAllShare", "/deleteShare", "/share", "/detail", "/users"};
+    private static final String[] loginRequiredURLs = new String[]{"/home", "/unlogin", "/create", "/edit", "/delete", "/deleteAllShare", "/deleteShare", "/share", "/updatePermission", "/detail", "/users", "/editProfile", "/deleteUser"};
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

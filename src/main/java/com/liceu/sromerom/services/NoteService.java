@@ -7,11 +7,10 @@ import com.liceu.sromerom.utils.RenderableNote;
 import java.util.List;
 
 public interface NoteService {
-    List<RenderableNote> getNotesFromUser(long userid, int page);
 
     List<RenderableNote> getCreatedNotes(long userid, int page);
 
-    long getAllNotesLength(long userid);
+    long getAllNotesLength(long userid, String optionSelect, String search, String initDate, String endDate, int page);
 
     long getCreatedNotesLength(long userid);
 
@@ -30,16 +29,6 @@ public interface NoteService {
     boolean deleteNote(long userid, String[] noteids);
 
     //Shared Notes Services
-
-    long getSharedNoteId(long noteid);
-
-    List<RenderableNote> getSharedNoteWithMe(long userid, int page);
-
-    List<RenderableNote> getSharedNotes(long userid, int page);
-
-    long getLengthSharedNoteWithMe(long userid);
-
-    long getLengthSharedNotes(long userid);
 
     boolean shareNote(long userWhoShares, long noteid, String permissionMode, String[] usernames);
 

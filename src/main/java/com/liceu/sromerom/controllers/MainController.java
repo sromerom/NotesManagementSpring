@@ -12,14 +12,4 @@ public class MainController {
         return "index";
     }
 
-
-    @GetMapping("/restrictedArea")
-    public String error() {
-        return "error";
-    }
-
-    @GetMapping("/emailNotFound")
-    public String emailTwitterNotFound() {
-        return "emailNotFound";
-    }
 }

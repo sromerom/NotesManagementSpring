@@ -24,7 +24,7 @@ public class NoteServiceImpl implements NoteService {
 
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     Pageable all = PageRequest.of(0, Integer.SIZE);
-    final static short LIMIT = 10;
+    final static short LIMIT = 9;
     @Autowired
     NoteRepo noteRepo;
 
@@ -36,29 +36,6 @@ public class NoteServiceImpl implements NoteService {
 
     @Autowired
     VersionRepo versionRepo;
-
-    @Override
-    public List<RenderableNote> getNotesFromUser(long userid, int page) {
-        Pageable topTen = PageRequest.of(page, LIMIT);
-        List<RenderableNote> renderableNotes;
-        List<SharedNote> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen);
-
-        /*
-        List<Note> sharedNotes = sharedNoteRepo.findByNote_User_Userid(userid, topTen)
-                .stream().map(a -> a.getNote())
-                .collect(Collectors.toList());
-         */
-        List<Note> allNotes = noteRepo.getAllNotesFromUser(userid, topTen);
-
-        try {
-            renderableNotes = parseNoteToRenderable(allNotes, sharedNotes, userid);
-            return renderableNotes;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     @Override
     public List<RenderableNote> getCreatedNotes(long userid, int page) {
@@ -79,9 +56,11 @@ public class NoteServiceImpl implements NoteService {
         return null;
     }
 
+
     @Override
-    public long getAllNotesLength(long userid) {
-        return noteRepo.countByUser_Userid(userid) + sharedNoteRepo.countByNote_User_Userid(userid);
+    public long getAllNotesLength(long userid, String optionSelect, String search, String initDate, String endDate, int page) {
+        List<RenderableNote> notes = filter(userid, optionSelect,search, initDate, endDate, -1);
+        return notes.size();
     }
 
     @Override
@@ -175,7 +154,7 @@ public class NoteServiceImpl implements NoteService {
                 default:
                     optionSelect = "default";
                     System.out.println("Filtramos en todas las notas!!");
-                    notes = noteRepo.filterNotesByAll(userid, search, initDate, endDate, limitPage);
+                    notes = noteRepo.filterAllNotes(userid, search, initDate, endDate, limitPage);
                     break;
             }
 
@@ -227,12 +206,12 @@ public class NoteServiceImpl implements NoteService {
         LocalDateTime myDateObj = LocalDateTime.now();
         String dateString = myDateObj.format(formatter);
         LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-        System.out.println("Esta es la fecha con la que se añadira la nota!!!!!!!!!!!!!!!!");
-        System.out.println(dateTime.toString());
 
         Note newNote = new Note();
         User userOwner = userRepo.findById(userid).get();
 
+        System.out.println("Title: " + title);
+        System.out.println("Body: " + body);
         newNote.setTitle(title);
         newNote.setBody(body);
         newNote.setCreationDate(dateTime);
@@ -302,57 +281,6 @@ public class NoteServiceImpl implements NoteService {
         }
 
         return false;
-    }
-
-
-    @Override
-    public long getSharedNoteId(long noteid) {
-        //return sharedNoteRepo.findBy
-        return 0;
-    }
-
-    @Override
-    public List<RenderableNote> getSharedNoteWithMe(long userid, int page) {
-        Pageable topTen = PageRequest.of(page, 10);
-        List<RenderableNote> renderableNotes = new ArrayList<>();
-        List<SharedNote> sharedNotesWithMe = sharedNoteRepo.findByUser_Userid(userid, topTen);
-
-        boolean writeable = false;
-        for (SharedNote sh : sharedNotesWithMe) {
-            if (sh.getPermissionMode().equals(PermissionMode.WRITEMODE)) writeable = true;
-            renderableNotes.add(new RenderableNote(sh.getNote().getNoteid(), sh.getNote().getUser(), null, sh.getNote().getTitle(), sh.getNote().getBody(), sh.getNote().getCreationDate(), sh.getNote().getLastModification(), writeable));
-            writeable = false;
-        }
-
-        return renderableNotes;
-    }
-
-    @Override
-    public List<RenderableNote> getSharedNotes(long userid, int page) {
-        List<RenderableNote> renderableNotes = new ArrayList<>();
-        Pageable topTen = PageRequest.of(page, LIMIT);
-        List<Note> sharedNotes = sharedNoteRepo.getSharedNotesByUserid(userid, topTen)
-                .stream().map(a -> a.getNote())
-                .distinct()
-                .collect(Collectors.toList());
-
-
-        for (Note n : sharedNotes) {
-            List<User> sharedUsersFromNote = noteRepo.getUsersFromSharedNote(n.getNoteid());
-            renderableNotes.add(new RenderableNote(n.getNoteid(), n.getUser(), sharedUsersFromNote, n.getTitle(), n.getBody(), n.getCreationDate(), n.getLastModification(), false));
-        }
-
-        return renderableNotes;
-    }
-
-    @Override
-    public long getLengthSharedNoteWithMe(long userid) {
-        return sharedNoteRepo.countByUser_Userid(userid);
-    }
-
-    @Override
-    public long getLengthSharedNotes(long userid) {
-        return sharedNoteRepo.countByNote_User_Userid(userid);
     }
 
     @Transactional

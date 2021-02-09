@@ -4,6 +4,8 @@
 <jsp:useBean id="util" class="com.liceu.sromerom.utils.ParseUtils"/>
 <html>
 <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta charset="UTF-8" />
     <title>Your Home</title>
     <link href="/resources/css/home.css" rel="stylesheet">
     <%@ include file="parts/header.jsp" %>
@@ -203,17 +205,17 @@
                     </select>
                 </div>
                 <div class="form-group mb-3 mt-3 mr-1 w-10">
-                    <input type="text" class="form-control" placeholder="title" aria-label="Username"
+                    <input type="text" class="form-control" placeholder="search something" aria-label="Username"
                            aria-describedby="basic-addon1" name="titleFilter">
                 </div>
                 <div class="form-group mb-3 mt-3 mr-1 w-10">
                     <div class="">
-                        <input id="startDate" class="form-control" type="text" name="noteStart" value="${initDate}"/>
+                        <input id="startDate" class="form-control" type="text" name="noteStart" value="${initDate}" placeholder="2021-02-03 10:12:00"/>
                     </div>
                 </div>
                 <div class="form-group mb-3 mt-3 mr-1 w-10">
                     <div class="">
-                        <input id="endDate" class="form-control" type="text" name="noteEnd" value="${endDate}"/>
+                        <input id="endDate" class="form-control" type="text" name="noteEnd" value="${endDate}" placeholder="2021-02-08 19:45:00"/>
                     </div>
                 </div>
                 <!--
@@ -264,6 +266,14 @@
 
     </div>
     <form action="${pageContext.request.contextPath}/delete" method="POST">
+        <c:if test="${noerror == false}">
+            <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
+                The note could not be deleted successfully
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </c:if>
         <input type="hidden" name="_csrftoken" value="${csrfToken}">
         <button id="buttonToDelete" type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalDelete">
             Delete Selected Notes

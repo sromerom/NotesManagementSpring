@@ -55,9 +55,14 @@
                 Sign in with Google
             </button>
             <!-- twitter button -->
-            <button id="loginTwitter" class="github__btn">
+            <button id="loginTwitter" class="twitter__btn">
                 <i class="fab fa-twitter"></i>
                 Sign in with Twitter
+            </button>
+            <!-- twitter button -->
+            <button id="loginFacebook" class="facebook__btn">
+                <i class="fab fa-facebook"></i>
+                Sign in with Facebook
             </button>
             <!-- Form end -->
             <p><a href="${pageContext.request.contextPath}/register">Create your account</a></p>
@@ -72,6 +77,10 @@
 
     document.querySelector("#loginTwitter").addEventListener("click", () => {
         window.location.replace("/loginTwitter");
+    })
+
+    document.querySelector("#loginFacebook").addEventListener("click", () => {
+        window.location.replace("/loginFacebook");
     })
 </script>
 </body>

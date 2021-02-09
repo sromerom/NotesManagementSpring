@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface VersionRepo extends JpaRepository<Version, Long> {
     List<Version> findByNote_NoteidOrderByVersionidDesc(Long noteid);
-    List<Version> findByBodyContaining(String body);
 
 }

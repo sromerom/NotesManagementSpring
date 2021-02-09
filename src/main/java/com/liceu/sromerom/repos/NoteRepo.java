@@ -13,27 +13,15 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
     //CreatedNotes & Filter
     List<Note> findByUser_Userid(long userid, Pageable pageable);
 
-    //@Query("from note n inner join n.user u where n.user.userid = :userid and (n.title like %:search% or note.body like %:body%) and n.creationDate BETWEEN :startDate and :endDate")
     @Query(
             value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate AND NOT note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE NOT sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
             nativeQuery = true)
     List<Note> filterCreatedNotes(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
 
-    //LengthCreatedNotes
     long countByUser_Userid(long userid);
 
-    //Is owner note?
-    //Note findNoteByNoteidAndUser_Userid(long noteid, long userid);
     boolean existsNoteByNoteidAndUser_Userid(long noteid, long userid);
-
-    @Query("from user u inner join u.sharedNotes sn where sn.note.noteid = :noteid")
-    List<User> getUsersFromSharedNote(@Param("noteid") Long noteid);
-
-    @Query(
-            value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid) ORDER BY note.noteid DESC",
-            nativeQuery = true)
-    List<Note> getAllNotesFromUser(@Param("userid") Long userid, Pageable pageable);
 
     //Filter search in versions
     @Query(
@@ -44,7 +32,7 @@ public interface NoteRepo extends JpaRepository<Note, Long> {
     @Query(
             value = "SELECT * FROM note INNER JOIN user ON user.userid = note.user_id WHERE note.user_id = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate OR note.noteid IN (SELECT sharedNote.note_noteid FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid WHERE sharedNote.user_userid = :userid AND (note.title REGEXP :search OR note.body REGEXP :search) AND creationDate BETWEEN :initDate AND :endDate) ORDER BY note.noteid DESC",
             nativeQuery = true)
-    List<Note> filterNotesByAll(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
+    List<Note> filterAllNotes(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
 
     //############## Filters by title, creation date and last modification DESC & ASC ##############//

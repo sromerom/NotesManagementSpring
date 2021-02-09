@@ -1,7 +1,6 @@
 package com.liceu.sromerom.services;
 
 
-
 import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.utils.TypeUser;
 
@@ -17,8 +16,11 @@ public interface UserService {
     User getUserById(long userid);
 
     User getUserByUsername(String username);
+
     User getUserByEmail(String email);
+
     User getUserByEmailAndTypeUser(String email, TypeUser typeUser);
+
     String createNewUsernameFromEmail(String email);
 
     boolean createUser(String email, String username, String password, TypeUser typeUser);

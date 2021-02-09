@@ -22,13 +22,13 @@ import java.util.Map;
 
 @Service
 public class GoogleServiceImpl implements GoogleService{
-    @Value("${client-id}")
+    @Value("${google-client-id}")
     String clientId;
 
-    @Value("${client-secret}")
+    @Value("${google-client-secret}")
     String clientSecret;
 
-    @Value("${redirect-uri}")
+    @Value("${google-redirect-uri}")
     String redirectUri;
 
     public URL getGoogleRedirectURL() throws Exception {

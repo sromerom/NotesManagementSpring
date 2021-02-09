@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
 
 @Controller
 public class NoteController {
@@ -43,7 +42,7 @@ public class NoteController {
         model.addAttribute("username", username);
 
         //Pagination
-        final double PAGES_FOR_NOTE = 10.0; //Quantitat de notes que volem per pagina
+        final double PAGES_FOR_NOTE = 9.0; //Quantitat de notes que volem per pagina
         int totalPages; //El numero total de pagines que tindra la paginacio, que variara segons el tipus de cerca que facem
         if (currentPage == null) {
             currentPage = 1;
@@ -53,10 +52,12 @@ public class NoteController {
         String filterURL = Filter.getURLFilter(typeNote, titleFilter, noteStart, noteEnd);
         model.addAttribute("filterURL", filterURL);
 
+        //Aconseguim les notes segons la cerca que hagui fet l'usuari(pasam el numero -1 indicant que no volem paginar y volem totes les notes)
         model.addAttribute("notes", noteService.filter(userid, typeNote,titleFilter, noteStart, noteEnd, (currentPage - 1)));
-        totalPages = (int) Math.ceil(noteService.filter(userid, typeNote, titleFilter, noteStart, noteEnd, -1).size() / (PAGES_FOR_NOTE));
+        totalPages = (int) Math.ceil(noteService.getAllNotesLength(userid, typeNote,titleFilter, noteStart, noteEnd, -1) / (PAGES_FOR_NOTE));
 
-        //Pasam a la vista tots els parametres corresponents amb la paginacio
+        System.out.println(totalPages + "");
+        model.addAttribute("typeNote", typeNote);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", currentPage);
 
@@ -71,9 +72,8 @@ public class NoteController {
             model.addAttribute("versionUrl", version);
             model.addAttribute("versions", versionService.getVersionsFromNote(noteid));
 
-            //Pasarem els atributs a la vista sempre i quan la nota sigui compartida amb tu
+            //Pasarem els atributs a la vista sempre i quan la nota sigui compartida amb tu o sigui owner
             if (noteService.isSharedNote(userid, noteid) || noteService.isNoteOwner(userid, noteid)) {
-
                 if (version == null) {
                     model.addAttribute("render", "note");
                     model.addAttribute("view", noteService.getNoteById(noteid));
@@ -82,12 +82,10 @@ public class NoteController {
                     model.addAttribute("view", versionService.getVersionById(version));
                 }
             } else {
-                //HACER REDIRECT A RESTRICTED AREA...
                 throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
-            //HACER REDIRECT A HOME..
-            return "redirect:/home";
+            throw new CustomGenericException("Note not found", "Sorry. There was a problem trying to get the note");
         }
         return "detail";
     }
@@ -95,12 +93,14 @@ public class NoteController {
     @PostMapping("/detail")
     public String postDetail(@RequestParam Long versionid, Model model) {
         Long userid = (Long) session.getAttribute("userid");
-        String titleVersion = "Copy of " + versionService.getVersionById(versionid).getTitle();
-        String bodyVersion = versionService.getVersionById(versionid).getBody();
-        boolean noError = noteService.addNote(userid, titleVersion, bodyVersion);
+        boolean noError = false;
+        if (versionid != null) {
+            String titleVersion = "Copy of " + versionService.getVersionById(versionid).getTitle();
+            String bodyVersion = versionService.getVersionById(versionid).getBody();
+            noError = noteService.addNote(userid, titleVersion, bodyVersion);
+        }
 
         if (noError) {
-            //HACER REDIRECT HACIA HOME...
             return "redirect:/detail?id=" + noteService.getCreatedNotes(userid, -1).get((int) (noteService.getCreatedNotesLength(userid) - 1)).getNoteid();
         }
 
@@ -116,19 +116,16 @@ public class NoteController {
 
     @PostMapping("/create")
     public String postCreate(@RequestParam String title, @RequestParam("bodyContent") String body, Model model) {
-
         long userid = (long) session.getAttribute("userid");
-
         boolean noError = false;
-        if (title != null && body != null) {
+
+        if (title != null && body != null && !body.equals("")) {
             //Cream la nota...
             noError = noteService.addNote(userid, title, body);
         }
 
-
         //Si no hi ha cap error, voldra dir que s'haura creat correctament la nota, i farem un redirect al home
         if (noError) {
-            //HACER REDIRECT HACIA HOME...
             return "redirect:/home";
         }
 
@@ -139,26 +136,18 @@ public class NoteController {
 
     @GetMapping("/edit")
     public String getEdit(@RequestParam("id") Long noteid, Model model) {
-        System.out.println("Noteid de la nota que vamos a actualizar: " + noteid);
-
         if (noteid != null) {
             Long userid = (Long) session.getAttribute("userid");
-
             model.addAttribute("action", "/edit");
 
             if (noteService.isNoteOwner(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
-                System.out.println("Si es note owner!! puede editar!!");
                 model.addAttribute("noteid", noteid);
-                model.addAttribute("title", noteService.getNoteById(noteid).getTitle());
-                model.addAttribute("body", noteService.getNoteById(noteid).getBody());
+                model.addAttribute("note", noteService.getNoteById(noteid));
             } else {
-                //HACER REDIRECT RESTRICTED AREA
                 throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
             }
         } else {
-            //HACER REDIRECT HOME
-            return "redirect:/home";
-
+            throw new CustomGenericException("Note not found", "Sorry. There was a problem trying to get the note");
         }
         return "userForm";
     }
@@ -168,7 +157,7 @@ public class NoteController {
         boolean noError = false;
 
         //Si estan tots els parametres necessaris, procedirem a actualitzar la nota
-        if (title != null && body != null) {
+        if (title != null && body != null && !title.equals("")) {
             //Actualitzam la nota...
             Long userid = (Long) session.getAttribute("userid");
             noError = noteService.editNote(userid, noteid, title, body);
@@ -185,21 +174,24 @@ public class NoteController {
     }
 
     @PostMapping("/delete")
-    public String postDelete(@RequestParam String[] checkboxDelete) {
-        System.out.println(Arrays.toString(checkboxDelete));
-        if (checkboxDelete != null) {
-            Long userid = (Long) session.getAttribute("userid");
+    public String postDelete(@RequestParam String[] checkboxDelete, Model model) {
+        Long userid = (Long) session.getAttribute("userid");
+        boolean noError = false;
+        if (checkboxDelete != null && checkboxDelete.length > 0) {
 
             //Eliminarem notes sempre i quan tinguem un id d'usuari i tinguem notes per eliminar
-            if (userid != null && checkboxDelete.length > 0) {
-                System.out.println("Eliminamos las notas: " + Arrays.toString(checkboxDelete));
-                noteService.deleteNote(userid, checkboxDelete);
-                //REDIRECT HACIA EL HOME...
-            } else {
-                //REDIRECT HACIA EL RESTRICTED AREA
-                throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
+            if (userid != null) {
+                noError = noteService.deleteNote(userid, checkboxDelete);
+
+                if (!noError) {
+                    throw new CustomGenericException("Note error", "Sorry. Something has wrong deleting the note/s. Try again later");
+                }
             }
         }
-        return "redirect:/home";
+
+        if (noError) {
+            return "redirect:/home";
+        }
+        throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
     }
 }

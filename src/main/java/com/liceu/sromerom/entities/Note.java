@@ -27,17 +27,17 @@ public class Note {
     @Column(nullable = false)
     private LocalDateTime lastModification;
 
-    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "note", cascade = CascadeType.MERGE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
 
 
     //1-n version
-    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "note", cascade = CascadeType.MERGE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 

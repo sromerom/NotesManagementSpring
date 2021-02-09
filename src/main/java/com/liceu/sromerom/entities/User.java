@@ -33,18 +33,18 @@ public class User {
     private TypeUser typeUser;
 
     //RELACIO 1-N amb notes
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade =CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade =CascadeType.REMOVE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
     //RELACIO N-N amb notes
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
 
 
     //1-n version
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 

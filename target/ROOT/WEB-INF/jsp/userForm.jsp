@@ -39,11 +39,11 @@
                     <h1>Create a new Note</h1>
                     <div class="form-group mt-2">
                         <label for="title" class="col-sm-2 col-form-label">Title</label>
-                        <input id="title" type="text" class="form-control rounded-right" name="title" required>
+                        <input id="title" type="text" class="form-control rounded-right" name="title">
                     </div>
                     <div class="form-group mt-2">
                         <label for="bodyContent">Body</label>
-                        <textarea class="form-control" id="bodyContent" rows="3" name="bodyContent">${body}</textarea>
+                        <textarea class="form-control" id="bodyContent" rows="3" name="bodyContent" required>${body}</textarea>
                     </div>
                     <button type="submit" class="btn btn-success">Add</button>
                 </c:if>
@@ -52,13 +52,13 @@
                     <div class="form-group mt-2">
                         <label for="titleUpdate" class="col-sm-2 col-form-label">Title</label>
                         <input id="titleUpdate" type="text" class="form-control rounded-right" name="title"
-                               value="${title}"
+                               value="${note.title}"
                                required>
                     </div>
                     <div class="form-group mt-2">
                         <label for="bodyContentUpdate">Body</label>
                         <textarea class="form-control" id="bodyContentUpdate" rows="3"
-                                  name="bodyContent">${body}</textarea>
+                                  name="bodyContent" required>${note.body}</textarea>
                     </div>
                     <button type="submit" class="btn btn-warning">Edit</button>
                 </c:if>

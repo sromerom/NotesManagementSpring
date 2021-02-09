@@ -14,6 +14,17 @@
     <%@ include file="parts/header.jsp" %>
 </head>
 <body>
+<header>
+    <nav id="header" class="p5 navbar navbar-expand-lg">
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/home"><i class="fas fa-arrow-left"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
 <c:if test="${noerror == false && action == '/share'}">
     <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
         The note could not be shared successfully
@@ -30,44 +41,63 @@
         </button>
     </div>
 </c:if>
+<c:if test="${noerror == false && action == '/updatePermission'}">
+    <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
+        Share permission could not be updated
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</c:if>
 <section id="container">
     <div>
-        <h2>Users that you have shared for this note</h2>
-        <table class="table table-striped table-dark">
-            <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Permission</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach var="sharedNote" items="${usersShared}">
-                <tr>
-                    <td>${sharedNote.user.username}</td>
-                    <td>
-                        <form method="POST" action="${pageContext.request.contextPath}/updatePermission">
-                            <input type="hidden" name="_csrftoken" value="${csrfToken}">
-                            <input type="hidden" name="noteid" value="${noteid}">
-                            <input type="hidden" name="shareduserid" value="${sharedNote.user.userid}">
-                            <select name="permissionMode" id="permissionMode2">
-                                <c:choose>
-                                    <c:when test="${sharedNote.permissionMode == 'READMODE'}">
-                                        <option selected="true" value="READMODE">Read Mode</option>
-                                        <option value="WRITEMODE">Write Mode</option>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <option value="READMODE">Read Mode</option>
-                                        <option selected="true" value="WRITEMODE">Write Mode</option>
-                                    </c:otherwise>
-                                </c:choose>
-                            </select>
-                            <button type="submit"> Edit</button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+        <c:choose>
+            <c:when test="${empty usersShared}">
+                <h2>Nothing user share to display</h2>
+            </c:when>
+            <c:otherwise>
+                <h2>Users shared for this note</h2>
+                <table class="table table-striped table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Permission</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="color: #e01a4f; font-weight: bold;">${userNoteOwner}</td>
+                        <td style="color: #e01a4f; font-weight: bold;">Note owner</td>
+                    </tr>
+                    <c:forEach var="sharedNote" items="${usersShared}">
+                        <tr>
+                            <td>${sharedNote.user.username}</td>
+                            <td>
+                                <form method="POST" action="${pageContext.request.contextPath}/updatePermission">
+                                    <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                                    <input type="hidden" name="noteid" value="${noteid}">
+                                    <input type="hidden" name="shareduserid" value="${sharedNote.user.userid}">
+                                    <select name="permissionMode" id="permissionMode2">
+                                        <c:choose>
+                                            <c:when test="${sharedNote.permissionMode == 'READMODE'}">
+                                                <option selected="true" value="READMODE">Read Mode</option>
+                                                <option value="WRITEMODE">Write Mode</option>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <option value="READMODE">Read Mode</option>
+                                                <option selected="true" value="WRITEMODE">Write Mode</option>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </select>
+                                    <button type="submit" class="btn btn-warning"> Edit</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </c:otherwise>
+        </c:choose>
         <c:if test="${action == '/deleteShare'}">
             <button id="buttonToDelete" type="button" class="btn btn-danger" data-toggle="modal"
                     data-target="#modalDeleteAllShares">
@@ -125,7 +155,6 @@
             </form>
     </div>
 </section>
-<p><a href="${pageContext.request.contextPath}/home">Go to home</a></p>
 <%@ include file="parts/footer.jsp" %>
 
 

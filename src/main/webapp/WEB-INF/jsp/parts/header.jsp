@@ -28,6 +28,8 @@
 
     .principalButton {
         background-color: #e01a4f !important;
+        color:white !important;
+        text-decoration: none !important;
     }
 </style>
 

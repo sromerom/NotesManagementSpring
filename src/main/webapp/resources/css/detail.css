@@ -25,15 +25,14 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     max-width: 800px;
+    min-height: 100vh;
     background-color: white;
     padding-left: 40px;
-    margin-top: 0x;
-    margin: 0px auto auto auto;
+    margin: 0 auto auto auto;
 }
 #renderNote > h1 {
     font-size: 3.5em;
 }
-div#renderNote hr {}
 
 #renderNote h1, #renderNote p, #renderNote hr{
     max-width: 800px;

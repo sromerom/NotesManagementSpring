@@ -26,19 +26,15 @@
             </div>
         </nav>
     </header>
-    <section id="containerView">
-        <div id="searchVersion">
-            <form>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Search a version"
-                           aria-label="Search a version" aria-describedby="button-addon2" name="search" value="">
-                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
-                </div>
-            </form>
-
-
+    <c:if test="${noerror == false}">
+        <div class="alert alert alert-danger alert-dismissible fade show" role="alert">
+            The note could not be copy successfully
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-
+    </c:if>
+    <section id="containerView">
         <div id="renderNote">
             <h1><c:out value="${view.title}"/></h1>
             <p>${util.renderToHTML(view.body)}</p>

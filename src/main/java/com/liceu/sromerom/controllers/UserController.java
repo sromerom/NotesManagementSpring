@@ -2,10 +2,7 @@ package com.liceu.sromerom.controllers;
 
 import com.liceu.sromerom.entities.User;
 import com.liceu.sromerom.exceptions.CustomGenericException;
-import com.liceu.sromerom.services.GoogleService;
-import com.liceu.sromerom.services.NoteService;
-import com.liceu.sromerom.services.TwitterService;
-import com.liceu.sromerom.services.UserService;
+import com.liceu.sromerom.services.*;
 import com.liceu.sromerom.utils.TypeUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +34,9 @@ public class UserController {
     TwitterService twitterService;
 
     @Autowired
+    FacebookService facebookService;
+
+    @Autowired
     HttpSession session;
 
     @GetMapping("/login")
@@ -65,8 +65,6 @@ public class UserController {
     @PostMapping("/unlogin")
     public String postUnlogin() {
         session.invalidate();
-
-        //HACER REDIRECT AL LOGIN
         return "redirect:/login";
     }
 
@@ -106,14 +104,14 @@ public class UserController {
             model.addAttribute("username", userService.getUserById(userid).getUsername());
             model.addAttribute("email", userService.getUserById(userid).getEmail());
         } else {
-            throw new CustomGenericException("Note permission", "Sorry. You don't have access to this note!");
+            throw new CustomGenericException("User permission", "Sorry. You don't have access to this account!");
         }
 
         return "userProfile";
     }
 
     @PostMapping("/editProfile")
-    public String postEditProfile(@RequestParam(required = false)  String newEmail,
+    public String postEditProfile(@RequestParam(required = false) String newEmail,
                                   @RequestParam(required = false) String newUser,
                                   @RequestParam(required = false) String currentPassword,
                                   @RequestParam(required = false) String newPass,
@@ -175,27 +173,51 @@ public class UserController {
     }
 
 
-
     @GetMapping("/loginGoogle")
     public String loginGoogle() throws Exception {
         URL url = googleService.getGoogleRedirectURL();
         return "redirect:" + url;
     }
 
-    @GetMapping("/loginTwitter")
-    public String loginTwitter() throws Exception {
-        Map<String, String> requestToken = twitterService.getRequestToken();
-        System.out.println("Result: " + requestToken);
-        URL url = twitterService.getUrlRedirectTwitter(requestToken.get("oauth_token"));
-        return "redirect: "+ url;
+    @GetMapping("/auth/google/oauth2callback/")
+    public String oauthCallback(@RequestParam String code, HttpSession session) throws Exception {
+        String accessToken = googleService.getAccessToken(code);
+        Map<String, String> userDetails = googleService.getUserDetails(accessToken);
+        String emailGoogleAccount = userDetails.get("email");
+
+        if (emailGoogleAccount != null) {
+            User userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
+            boolean noError = false;
+
+            if (userIsRegistred != null) {
+                noError = true;
+            }
+
+            if (userIsRegistred == null) {
+                String usernameGenerated = userService.createNewUsernameFromEmail(userDetails.get("email"));
+                noError = userService.createUser(emailGoogleAccount, usernameGenerated, null, TypeUser.GOOGLE);
+            }
+
+            if (noError) {
+                userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
+                session.setAttribute("userid", userIsRegistred.getUserid());
+                return "redirect:/home";
+            }
+        }
+        throw new CustomGenericException("Login Google error", "Sorry. There was a problem trying to login with Google account. Try again later.");
     }
 
-    //http://127.0.0.1:8080/auth/twitter/oauth2callback/
+
+    @GetMapping("/loginTwitter")
+    public String loginTwitter() {
+        Map<String, String> requestToken = twitterService.getRequestToken();
+        URL url = twitterService.getUrlRedirectTwitter(requestToken.get("oauth_token"));
+        return "redirect: " + url;
+    }
+
     @GetMapping("/auth/twitter/oauth2callback/")
-    public String twitterAuthCallback(@RequestParam String oauth_token, @RequestParam String oauth_verifier) throws Exception {
+    public String twitterAuthCallback(@RequestParam String oauth_token, @RequestParam String oauth_verifier) {
         Map<String, String> accessTokenUser = twitterService.getAccessToken(oauth_token, oauth_verifier);
-        System.out.println("oauth_token: " + accessTokenUser.get("oauth_token"));
-        System.out.println("oauth_secret_token: " + accessTokenUser.get("oauth_token_secret"));
         Map<String, Object> verify_credentials = twitterService.getAccountDetails(accessTokenUser.get("oauth_token"), accessTokenUser.get("oauth_token_secret"));
         String emailTwitterAccount = (String) verify_credentials.get("email");
 
@@ -205,14 +227,11 @@ public class UserController {
             boolean noError = false;
 
             if (userIsRegistred != null) {
-                System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
-                //Ya esta registrado, lo llevamos al home
                 noError = true;
             }
 
             if (userIsRegistred == null) {
                 String usernameGenerated = userService.createNewUsernameFromEmail(emailTwitterAccount);
-                System.out.println("Es un usuario nuevo y por eso le creamos este usuario provisional: " + usernameGenerated);
                 noError = userService.createUser(emailTwitterAccount, usernameGenerated, null, TypeUser.TWITTER);
             }
 
@@ -224,45 +243,40 @@ public class UserController {
         } else {
             throw new CustomGenericException("Email Error", "Sorry. If you want entry with twitter account, you must have an email address assigned in your account.");
         }
-
-        return "redirect:/login";
+        throw new CustomGenericException("Login Twitter error", "Sorry. There was a problem trying to login with Twitter account. Try again later.");
     }
 
+    @GetMapping("/loginFacebook")
+    public String loginFacebook() throws Exception {
+        URL url = facebookService.getFacebookURL();
+        return "redirect:" + url;
+    }
 
-    @GetMapping("/auth/oauth2callback/")
-    public String oauthCallback(@RequestParam String code, HttpSession session) throws Exception {
-        String accessToken = googleService.getAccessToken(code);
-        Map<String, String> userDetails = googleService.getUserDetails(accessToken);
-        String emailGoogleAccount = userDetails.get("email");
-        User userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
-        boolean noError = false;
+    @GetMapping("/auth/facebook/oauth2callback/")
+    public String facebookAuthCallback(@RequestParam String code, HttpSession session) throws Exception {
+        String accessToken = facebookService.getAccessToken(code);
+        Map<String, Object> facebookData = facebookService.getData(accessToken);
+        String emailFacebookAccount = (String) facebookData.get("email");
+        String usernameFacebookAccount = (String) facebookData.get("name");
 
+        if (emailFacebookAccount != null) {
+            User userIsRegistred = userService.getUserByEmail(emailFacebookAccount);
+            boolean noError = false;
 
-        if (userIsRegistred != null) {
-            System.out.println("Ya esta resgistrado! Nos lo llevamos al home");
-            //Ya esta registrado, lo llevamos al home
-            noError = true;
+            if (userIsRegistred != null) {
+                noError = true;
+            }
+
+            if (userIsRegistred == null) {
+                noError = userService.createUser(emailFacebookAccount, usernameFacebookAccount, null, TypeUser.FACEBOOK);
+            }
+
+            if (noError) {
+                userIsRegistred = userService.getUserByEmail(emailFacebookAccount);
+                session.setAttribute("userid", userIsRegistred.getUserid());
+                return "redirect:/home";
+            }
         }
-        /*
-        //Quitar en un futuro
-        if (user != null && !user.isTypeUser()) {
-            System.out.println("Ya hay una cuenta registrada con dicho email...");
-            //Ir a pantalla dedicada
-        }
-         */
-
-        if (userIsRegistred == null) {
-            String usernameGenerated = userService.createNewUsernameFromEmail(userDetails.get("email"));
-            System.out.println("Es un usuario nuevo y por eso le creamos este usuario provisional: " + usernameGenerated);
-            noError = userService.createUser(emailGoogleAccount, usernameGenerated, null, TypeUser.GOOGLE);
-        }
-
-        if (noError) {
-            userIsRegistred = userService.getUserByEmail(emailGoogleAccount);
-            session.setAttribute("userid", userIsRegistred.getUserid());
-            return "redirect:/home";
-        } else {
-            return "redirect:/login";
-        }
+        throw new CustomGenericException("Login Facebook error", "Sorry. There was a problem trying to login with Facebook account. Try again later.");
     }
 }
