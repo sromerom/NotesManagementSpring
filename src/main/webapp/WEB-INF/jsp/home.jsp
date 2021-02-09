@@ -321,7 +321,7 @@
                                         <p class="card-text"
                                            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;overflow: hidden;">${util.cleanBody(note.body)}</p>
                                         <div class="optionsButtons">
-                                            <a href="${pageContext.request.contextPath}/edit?id=${note.noteid}">
+                                            <a href="${pageContext.request.contextPath}/edit/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-pencil-fill"
                                                      fill="currentColor"
@@ -331,7 +331,7 @@
                                                 </svg>
                                             </a>
                                             <a class="card-link"
-                                               href="${pageContext.request.contextPath}/share?id=${note.noteid}">
+                                               href="${pageContext.request.contextPath}/share/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-share-fill"
                                                      fill="currentColor"
@@ -340,7 +340,7 @@
                                                           d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"></path>
                                                 </svg>
                                             </a>
-                                            <a href="${pageContext.request.contextPath}/deleteShare?id=${note.noteid}">
+                                            <a href="${pageContext.request.contextPath}/deleteShare/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-person-x-fill"
                                                      fill="currentColor"
@@ -350,7 +350,7 @@
                                                 </svg>
                                             </a>
                                         </div>
-                                        <a href="${pageContext.request.contextPath}/detail?id=${note.noteid}">
+                                        <a href="${pageContext.request.contextPath}/detail/${note.noteid}">
                                             <span class="link-spanner"></span>
                                         </a>
                                         <h6 class="card-subtitle mb-2 text-muted dateInfo"
@@ -372,7 +372,7 @@
                                            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;overflow: hidden;">${util.cleanBody(note.body)}</p>
 
                                         <div class="optionsButtons">
-                                            <a href="${pageContext.request.contextPath}/edit?id=${note.noteid}">
+                                            <a href="${pageContext.request.contextPath}/edit/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-pencil-fill"
                                                      fill="currentColor"
@@ -382,7 +382,7 @@
                                                 </svg>
                                             </a>
                                             <a class="card-link"
-                                               href="${pageContext.request.contextPath}/share?id=${note.noteid}">
+                                               href="${pageContext.request.contextPath}/share/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-share-fill"
                                                      fill="currentColor"
@@ -392,7 +392,7 @@
                                                 </svg>
                                             </a>
                                         </div>
-                                        <a href="${pageContext.request.contextPath}/detail?id=${note.noteid}">
+                                        <a href="${pageContext.request.contextPath}/detail/${note.noteid}">
                                             <span class="link-spanner"></span>
                                         </a>
 
@@ -415,7 +415,7 @@
                                 <div class="optionsButtons">
                                     <c:choose>
                                         <c:when test="${note.writeable eq true}">
-                                            <a href="${pageContext.request.contextPath}/edit?id=${note.noteid}">
+                                            <a href="${pageContext.request.contextPath}/edit/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-pencil-fill"
                                                      fill="currentColor"
@@ -425,7 +425,7 @@
                                                 </svg>
                                             </a>
                                             <a class="card-link"
-                                               href="${pageContext.request.contextPath}/share?id=${note.noteid}">
+                                               href="${pageContext.request.contextPath}/share/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-share-fill"
                                                      fill="currentColor"
@@ -434,7 +434,7 @@
                                                           d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"></path>
                                                 </svg>
                                             </a>
-                                            <a href="${pageContext.request.contextPath}/deleteShare?id=${note.noteid}">
+                                            <a href="${pageContext.request.contextPath}/deleteShare/${note.noteid}">
                                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                                      class="bi bi-person-x-fill"
                                                      fill="currentColor"
@@ -458,7 +458,7 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
-                                <a href="${pageContext.request.contextPath}/detail?id=${note.noteid}">
+                                <a href="${pageContext.request.contextPath}/detail/${note.noteid}">
                                     <span class="link-spanner"></span>
                                 </a>
                                 <h6 class="card-subtitle mb-2 text-muted dateInfo"

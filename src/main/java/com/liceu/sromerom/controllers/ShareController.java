@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -26,8 +27,9 @@ public class ShareController {
     @Autowired
     HttpSession session;
 
-    @GetMapping("/share")
-    public String share(@RequestParam("id") Long noteid, Model model) {
+    //@PathVariable("noteid")
+    @GetMapping("/share/{noteid}")
+    public String share(@PathVariable("noteid") Long noteid, Model model) {
         //Si hi ha parametre en la url, procedirem a enviar el usuaris que amb els que ha compartir i carregarem el select amb tots els usuaris
         if (noteid != null) {
             Long userid = (Long) session.getAttribute("userid");
@@ -74,8 +76,8 @@ public class ShareController {
         return "shares";
     }
 
-    @GetMapping("/deleteShare")
-    public String getDeleteShare(@RequestParam("id") Long noteid, Model model) {
+    @GetMapping("/deleteShare/{noteid}")
+    public String getDeleteShare(@PathVariable("noteid") Long noteid, Model model) {
         if (noteid != null) {
             Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("username", userService.getUserById(userid).getUsername());

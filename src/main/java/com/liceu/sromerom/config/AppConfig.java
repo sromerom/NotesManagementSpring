@@ -38,7 +38,7 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //Interceptor Auth/login
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/*");
+        registry.addInterceptor(loginInterceptor).addPathPatterns("/*", "/*/*", "/*/*/*");
 
         //Interceptor CSRF
         registry.addInterceptor(generateCsrfTokenInterceptor).addPathPatterns("/*");

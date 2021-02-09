@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,7 @@ public class FacebookServiceImpl implements FacebookService{
         URIBuilder b = new URIBuilder("https://www.facebook.com/v9.0/dialog/oauth");
         b.addParameter("client_id", clientId);
         b.addParameter("redirect_uri", redirectUri);
-        b.addParameter("state", "{st=state123abc,ds=123456789}");
+        b.addParameter("state", generateNonce());
         b.addParameter("scope", "email");
         return b.build().toURL();
     }
@@ -78,5 +79,15 @@ public class FacebookServiceImpl implements FacebookService{
         CloseableHttpResponse response = httpClient.execute(get);
         response.getEntity();
         return EntityUtils.toString(response.getEntity());
+    }
+
+    private String generateNonce(){
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 15; i++) {
+            stringBuilder.append(secureRandom.nextInt(10));
+        }
+        String randomNumber = stringBuilder.toString();
+        return randomNumber;
     }
 }

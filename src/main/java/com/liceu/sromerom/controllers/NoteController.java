@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -64,8 +65,8 @@ public class NoteController {
         return "home";
     }
 
-    @GetMapping("/detail")
-    public String detail(@RequestParam("id") Long noteid, @RequestParam(required = false) Long version, Model model) {
+    @GetMapping(value = {"/detail/{noteid}", "/detail/{noteid}/{version}"})
+    public String detail(@PathVariable("noteid") Long noteid, @PathVariable(value = "version", required = false) Long version, Model model) {
         if (noteid != null) {
             Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("actualNote", noteService.getNoteById(noteid));
@@ -134,8 +135,8 @@ public class NoteController {
         return "userForm";
     }
 
-    @GetMapping("/edit")
-    public String getEdit(@RequestParam("id") Long noteid, Model model) {
+    @GetMapping("/edit/{noteid}")
+    public String getEdit(@PathVariable("noteid") Long noteid, Model model) {
         if (noteid != null) {
             Long userid = (Long) session.getAttribute("userid");
             model.addAttribute("action", "/edit");

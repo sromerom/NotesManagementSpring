@@ -64,12 +64,12 @@
                                 <div class="list-group">
                                     <c:choose>
                                     <c:when test="${empty versionUrl}">
-                                    <a href="/detail?id=${actualNote.noteid}"
+                                    <a href="/detail/${actualNote.noteid}"
                                        class="list-group-item list-group-item-action active"
                                        aria-current="true">
                                         </c:when>
                                         <c:otherwise>
-                                        <a href="/detail?id=${actualNote.noteid}"
+                                        <a href="/detail/${actualNote.noteid}"
                                            class="list-group-item list-group-item-action"
                                            aria-current="true">
                                             </c:otherwise>
@@ -87,11 +87,11 @@
 
                                         <c:choose>
                                         <c:when test="${versionUrl == version.versionid}">
-                                        <a href="/detail?id=${actualNote.noteid}&version=${version.versionid}"
+                                        <a href="/detail/${actualNote.noteid}/${version.versionid}"
                                            class="list-group-item list-group-item-action active" aria-current="true">
                                             </c:when>
                                             <c:otherwise>
-                                            <a href="/detail?id=${actualNote.noteid}&version=${version.versionid}"
+                                            <a href="/detail/${actualNote.noteid}/${version.versionid}"
                                                class="list-group-item list-group-item-action" aria-current="true">
                                                 </c:otherwise>
                                                 </c:choose>

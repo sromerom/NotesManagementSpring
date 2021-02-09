@@ -10,10 +10,10 @@
       integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
       crossorigin="anonymous"/>
 <style>
-
     header {
         background-color: #e01a4f;
         color: white;
+        height: 75px !important;
     }
 
 
