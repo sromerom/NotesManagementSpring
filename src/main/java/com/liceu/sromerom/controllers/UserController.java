@@ -122,8 +122,13 @@ public class UserController {
 
         boolean noError = false;
 
+        if (userService.getUserById(userid).getTypeUser().equals(TypeUser.NATIVE)) {
+
+        }
+
+
         //Si tenim null el email i username i la resta no, voldra dir que nomes esta modificant la contrasenya
-        if (newEmail == null && newUser == null && currentPassword != null && newPass != null && newPassConfirm != null) {
+        if (userService.getUserById(userid).getTypeUser().equals(TypeUser.NATIVE) && newEmail == null && newUser == null && currentPassword != null && newPass != null && newPassConfirm != null) {
             boolean validInfo = userService.checkPasswordData(userid, currentPassword, newPass, newPassConfirm);
             if (validInfo) {
                 noError = userService.editPassword(userid, newPass);
