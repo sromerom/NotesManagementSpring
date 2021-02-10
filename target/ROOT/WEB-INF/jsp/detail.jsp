@@ -81,7 +81,7 @@
                                                     ago</small>
                                             </div>
                                             <small>Current version</small>
-                                            <p class="mb-1">${view.user.username}</p>
+                                            <p class="mb-1">Owner note ${view.user.username}</p>
                                         </a>
                                         <c:forEach var="version" items="${versions}">
 

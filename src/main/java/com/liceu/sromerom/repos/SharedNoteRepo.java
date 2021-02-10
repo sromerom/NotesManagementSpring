@@ -11,6 +11,15 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> {
+    SharedNote findByUser_UseridAndNote_Noteid(long userid, long noteid);
+
+    boolean existsSharedNoteByUser_UseridAndNote_Noteid(long userid, long noteid);
+
+    boolean existsSharedNoteByNote_Noteid(long noteid);
+
+    void deleteSharedNotesByNote_Noteid(long noteid);
+
+
     //SharedNotes & Filter
     @Query(
             value = "SELECT * FROM sharedNote INNER JOIN note ON sharedNote.note_noteid = note.noteid INNER JOIN user ON user.userid = sharedNote.user_userid WHERE note.user_id = :userid ORDER BY sharedNote.note_noteid DESC",
@@ -30,14 +39,6 @@ public interface SharedNoteRepo extends JpaRepository<SharedNote, SharedNoteCK> 
             nativeQuery = true)
     List<SharedNote> filterSharedNotesWithMe(@Param("userid") Long userid, @Param("search") String search, @Param("initDate") String initDate, @Param("endDate") String endDate, Pageable pageable);
 
-
-    SharedNote findByUser_UseridAndNote_Noteid(long userid, long noteid);
-    boolean existsSharedNoteByUser_UseridAndNote_Noteid(long userid, long noteid);
-
-    boolean existsSharedNoteByNote_Noteid(long noteid);
-
-
-    void deleteSharedNotesByNote_Noteid(long noteid);
 
 
 }

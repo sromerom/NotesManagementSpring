@@ -5,11 +5,6 @@ import com.liceu.sromerom.utils.PermissionMode;
 import javax.persistence.*;
 
 
-//@Table(uniqueConstraints={
-// @UniqueConstraint(columnNames = {"actor_id, film_id"})
-// })
-
-//cascade = CascadeType.ALL, orphan
 @Entity(name = "sharedNote")
 public class SharedNote {
     @EmbeddedId
@@ -28,8 +23,7 @@ public class SharedNote {
 
 
     @Enumerated(EnumType.STRING)
-    //@Column(name = "permission_mode", nullable = false)
-    @Column(name = "permission_mode")
+    @Column(name = "permission_mode", nullable = false)
     private PermissionMode permissionMode;
 
 

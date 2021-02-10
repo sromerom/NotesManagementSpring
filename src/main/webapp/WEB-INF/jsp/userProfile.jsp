@@ -47,8 +47,9 @@
                                     </div>
                                     <div class="col d-flex flex-column flex-sm-row justify-content-between mb-3">
                                         <div class="text-center text-sm-left mb-2 mb-sm-0">
-                                            <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap">${username}</h4>
-                                            <p class="mb-0">@${username}</p>
+                                            <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap">${user.username}</h4>
+                                            <p class="mb-0">@${user.username}</p>
+                                            <p>Registred with ${user.typeUser} method.</p>
                                             <div class="mt-2">
                                                 <button class="btn btn-primary" type="button">
                                                     <i class="fa fa-fw fa-camera"></i>
@@ -70,8 +71,8 @@
                                                             <div class="form-group">
                                                                 <label>Username</label>
                                                                 <input class="form-control" type="text"
-                                                                       placeholder="${username}" name="newUser"
-                                                                       value="${username}">
+                                                                       placeholder="${user.username}" name="newUser"
+                                                                       value="${user.username}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -81,7 +82,7 @@
                                                                 <label>Email</label>
                                                                 <input class="form-control" type="text"
                                                                        placeholder="email" name="newEmail"
-                                                                       value="${email}">
+                                                                       value="${user.email}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -92,7 +93,7 @@
                                                         </div>
                                                     </div>
                                                 </form>
-                                                <c:if test="${typeUser == 'NATIVE'}">
+                                                <c:if test="${user.typeUser == 'NATIVE'}">
                                                     <form class="form" novalidate="" method="POST"
                                                           action="${pageContext.request.contextPath}/editProfile">
                                                         <input type="hidden" name="_csrftoken" value="${csrfToken}">

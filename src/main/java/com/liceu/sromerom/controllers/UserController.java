@@ -46,11 +46,10 @@ public class UserController {
 
     @PostMapping("login")
     public String postLogin(@RequestParam("username") String username, @RequestParam("password") String pass, Model model) {
-        //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
         User user = userService.getUserByUsername(username);
 
-        //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
         if (user != null && pass != null) {
+            //Iniciarem sessio sempre i quan els parametres no siguin null i la validacio d'usuari sigui true
             if (user.getTypeUser().equals(TypeUser.NATIVE) && userService.validateUser(username, pass)) {
                 session.setAttribute("userid", userService.getUserByUsername(username).getUserid());
                 return "redirect:/home";
@@ -100,9 +99,7 @@ public class UserController {
     public String getEditProfile(Model model) {
         Long userid = (Long) session.getAttribute("userid");
         if (userid != null && userService.getUserById(userid) != null) {
-            model.addAttribute("typeUser", userService.getUserById(userid).getTypeUser());
-            model.addAttribute("username", userService.getUserById(userid).getUsername());
-            model.addAttribute("email", userService.getUserById(userid).getEmail());
+            model.addAttribute("user", userService.getUserById(userid));
         } else {
             throw new CustomGenericException("User permission", "Sorry. You don't have access to this account!");
         }
@@ -149,9 +146,7 @@ public class UserController {
 
         model.addAttribute("noerror", false);
         model.addAttribute("action", "edit");
-        model.addAttribute("typeUser", userService.getUserById(userid).getTypeUser());
-        model.addAttribute("username", userService.getUserById(userid).getUsername());
-        model.addAttribute("email", userService.getUserById(userid).getEmail());
+        model.addAttribute("user", userService.getUserById(userid));
         return "userProfile";
     }
 

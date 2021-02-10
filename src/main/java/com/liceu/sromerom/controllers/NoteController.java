@@ -57,7 +57,6 @@ public class NoteController {
         model.addAttribute("notes", noteService.filter(userid, typeNote,titleFilter, noteStart, noteEnd, (currentPage - 1)));
         totalPages = (int) Math.ceil(noteService.getAllNotesLength(userid, typeNote,titleFilter, noteStart, noteEnd, -1) / (PAGES_FOR_NOTE));
 
-        System.out.println(totalPages + "");
         model.addAttribute("typeNote", typeNote);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", currentPage);
@@ -102,7 +101,7 @@ public class NoteController {
         }
 
         if (noError) {
-            return "redirect:/detail?id=" + noteService.getCreatedNotes(userid, -1).get((int) (noteService.getCreatedNotesLength(userid) - 1)).getNoteid();
+            return "redirect:/detail/" + noteService.getCreatedNotes(userid, -1).get((int) (noteService.getCreatedNotesLength(userid) - 1)).getNoteid();
         }
 
         model.addAttribute("noerror", false);

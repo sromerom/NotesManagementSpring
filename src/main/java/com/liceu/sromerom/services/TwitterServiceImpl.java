@@ -268,7 +268,6 @@ public class TwitterServiceImpl implements TwitterService {
         }
 
 
-        System.out.println("GET: " + Arrays.toString(get.getHeaders("Authorization")));
         CloseableHttpResponse response = httpClient.execute(get);
         response.getEntity();
         return EntityUtils.toString(response.getEntity());

@@ -43,10 +43,6 @@ public class ParseUtils {
 
     public static Long getDifferenceDays(LocalDateTime ldt1) {
         LocalDateTime ldt2 = LocalDateTime.now();
-
-
-        long daysBetween = Duration.between(ldt1, ldt2).toDays();
-        System.out.println ("Days: " + daysBetween);
-        return daysBetween;
+        return Duration.between(ldt1, ldt2).toDays();
     }
 }

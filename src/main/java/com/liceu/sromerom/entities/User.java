@@ -8,11 +8,6 @@ import javax.persistence.*;
 import java.util.Set;
 
 
-/*
-@Table(name = "user",
-        uniqueConstraints = { @UniqueConstraint( columnNames = { "email", "type_user" } ) } )
-
- */
 @Entity(name = "user")
 public class User {
     @Id
@@ -33,18 +28,18 @@ public class User {
     private TypeUser typeUser;
 
     //RELACIO 1-N amb notes
-    @OneToMany(mappedBy = "user", cascade =CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade =CascadeType.MERGE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Note> notes;
 
     //RELACIO N-N amb notes
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SharedNote> sharedNotes;
 
 
     //1-n version
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Version> versions;
 
@@ -102,6 +97,13 @@ public class User {
 
     public void setSharedNotes(Set<SharedNote> sharedNotes) {
         this.sharedNotes = sharedNotes;
+    }
+
+    public Set<Version> getVersions() {
+        return versions;
+    }
+    public void setVersions(Set<Version> versions) {
+        this.versions = versions;
     }
 
     @Override

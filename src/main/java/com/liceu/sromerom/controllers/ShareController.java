@@ -27,7 +27,7 @@ public class ShareController {
     @Autowired
     HttpSession session;
 
-    //@PathVariable("noteid")
+
     @GetMapping("/share/{noteid}")
     public String share(@PathVariable("noteid") Long noteid, Model model) {
         //Si hi ha parametre en la url, procedirem a enviar el usuaris que amb els que ha compartir i carregarem el select amb tots els usuaris
@@ -68,7 +68,7 @@ public class ShareController {
         if (noError) {
             boolean isSessionUser = Arrays.stream(toShare).anyMatch(username -> username.equalsIgnoreCase(userService.getUserById(userid).getUsername()));
             if (isSessionUser) return "redirect:/home";
-            return "redirect:/share?id=" + noteid;
+            return "redirect:/share/" + noteid;
         }
 
         model.addAttribute("noerror", false);
@@ -84,6 +84,9 @@ public class ShareController {
             model.addAttribute("noteid", noteid);
             model.addAttribute("users", userService.getSharedUsers(noteid));
             model.addAttribute("usersShared", noteService.getPermissionFromSharedUsers(noteid));
+            model.addAttribute("userNoteOwner", noteService.getNoteById(noteid).getUser().getUsername());
+
+
 
             if (noteService.isNoteOwner(userid, noteid) || noteService.hasWritePermission(userid, noteid)) {
                 model.addAttribute("action", "/deleteShare");
@@ -114,7 +117,7 @@ public class ShareController {
             if (noError) {
                 boolean isSessionUser = Arrays.stream(toDeleteShare).anyMatch(username -> username.equalsIgnoreCase(userService.getUserById(userid).getUsername()));
                 if (isSessionUser) return "redirect:/home";
-                return "redirect:/deleteShare?id=" + noteid;
+                return "redirect:/deleteShare/" + noteid;
             }
         } else {
             throw new CustomGenericException("Note not found", "Sorry. There was a problem trying to get the note");
@@ -158,9 +161,8 @@ public class ShareController {
         }
 
         if (noError) {
-            //boolean isSessionUser = Arrays.stream(toDeleteShare).anyMatch(username -> username.equalsIgnoreCase(userService.getUserById(userid).getUsername()));
             if (shareduserid.equals(userid)) return "redirect:/home";
-            return "redirect:/share?id=" + noteid;
+            return "redirect:/share/" + noteid;
         }
 
         model.addAttribute("noerror", false);

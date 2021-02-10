@@ -1,24 +1,17 @@
 package com.liceu.sromerom.services;
 
 import com.google.gson.Gson;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.net.URL;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -75,7 +68,6 @@ public class FacebookServiceImpl implements FacebookService{
     private String doGet(URL url) throws Exception {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet get = new HttpGet(url.toString());
-        System.out.println("url: " + url.toString());
         CloseableHttpResponse response = httpClient.execute(get);
         response.getEntity();
         return EntityUtils.toString(response.getEntity());

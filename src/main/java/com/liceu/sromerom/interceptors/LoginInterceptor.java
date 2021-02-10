@@ -23,15 +23,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         String urlLogin = request.getContextPath() + "/login";
         Long userid = (Long) session.getAttribute("userid");
 
-        
-        System.out.println("userid en el interceptor: " + userid);
+
         //No ha fet login y a damunt vol entrar en la part privada
         if (userid == null && needLogin(request)) {
             response.sendRedirect(request.getContextPath() + "/login");
             return false;
         }
 
-        System.out.println(request.getRequestURI());
+
         //L'usuari ya ha fet login i esta en la pagina login, per tant, ho duim a la pagina principal per que ja esta autenticat i no pinta res en el login
         if (userid != null && request.getRequestURI().equals(urlLogin)) {
             response.sendRedirect(request.getContextPath() + "/home");

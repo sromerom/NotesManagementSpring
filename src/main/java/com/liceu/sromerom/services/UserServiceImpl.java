@@ -116,7 +116,6 @@ public class UserServiceImpl implements UserService {
     public boolean createUser(String email, String username, String password, TypeUser typeUser) {
         User validateUsername = userRepo.findUserByUsername(username);
         if (validateUsername == null) {
-            System.out.println("Entras aqui???????????????????");
             try {
                 User newUser = new User();
                 String generatedSecuredPassword;
@@ -130,7 +129,6 @@ public class UserServiceImpl implements UserService {
                 newUser.setPassword(generatedSecuredPassword);
                 newUser.setTypeUser(typeUser);
                 User insertedUser = userRepo.save(newUser);
-                System.out.println("Ha salido bien??????????????????????: " + insertedUser);
                 if (insertedUser != null) return true;
                 return false;
             } catch (Exception e) {
@@ -142,27 +140,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsUserShare(long noteid, long userid, String[] sharedUsers) {
-        System.out.println("UserWhoDeleteShare: " + userid);
-        System.out.println("noteid: " + noteid);
-        System.out.println("Users to delete: " + Arrays.toString(sharedUsers));
 
-        //User user = userRepo.findById(userid).get();
-        //boolean isOwner = noteRepo.existsNoteByNoteidAndUser_Userid(noteid, userid);
-        //Note noteOwner = noteRepo.findNoteByNoteidAndUser_Userid(noteid, userid);
         List<User> usersShared = userRepo.getUsersFromSharedNote(noteid);
-
-        //Si no es owner, voldra dir que l'usuari amb qui s'ha compartit la nota, no vol seguir amb aquell share.
-        /*
-        if (noteOwner == null) {
-            usersShared.add(user);
-        } else { //L'usuari qui l'ha compartit, vol descompartir-la ara.
-            usersShared = userRepo.getUsersFromSharedNote(noteid);
-        }
-         */
         int aux = 0;
         for (User u : usersShared) {
             for (String sharedUser : sharedUsers) {
-                System.out.println(u.getUsername() + "=?" + sharedUser);
                 if (u.getUsername().equals(sharedUser)) {
                     aux++;
                     break;
@@ -294,7 +276,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteUser(long userid) {
         User userToDelete = userRepo.findById(userid).get();
-        System.out.println("Usuario a eliminar: " + userToDelete);
         if (userToDelete != null) {
             userRepo.delete(userToDelete);
             if (userRepo.existsById(userToDelete.getUserid())) return false;
