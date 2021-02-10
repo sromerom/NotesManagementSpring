@@ -165,7 +165,6 @@ public class UserServiceImpl implements UserService {
                 return HashUtil.validatePassword(password, storedPassword);
             }
         } catch (Exception e) {
-            System.out.println(e);
             return false;
         }
         return false;
